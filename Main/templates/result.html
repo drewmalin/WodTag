@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block body %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    $(document).ready(function() {
+        $(".readOnlyTags").css("border", "0px");
+        $(".readOnlyTags").css("display", "inline-block");
+        $(".readOnlyTags").css("margin-bottom", "0px");
+    });
+    $(function() {
+        $('.readOnlyTags').tagit({
+            readOnly: true
+        });
+    });
+</script>
+<div class="container">
+    <div class="page-header">
+        <h1>Workout Result</h1>
+        <h4 class="pull-left"><a href="/workout_template/{{ result.workout.id }}">{{ result.workout.name }}</a></h4>
+        <h4 class="pull-right"><a href="/user/{{ result.user.id }}">{{ result.user.username }}</a></h4>
+        <br /><br />
+        <h5 class="pull-left text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</h5>
+        <h4 class="pull-right"><a href="/gym/{{ result.user.member_of_gym.id }}">{{ result.user.member_of_gym.name }}</a></h4>
+    </div>
+    <br />
+    <hr>
+    <div class="form-workout">
+    {% for part in result.parts %}
+        <div class="row">
+            <div class="well well-lg">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="maintain-newline">{{ part.part.description }}</div>
+                        {% if part.part.tags %}
+                            <br />
+                            <ul class="readOnlyTags">
+                            {% for tag in part.part.tags %}
+                                <li>{{ tag.name }}</li>
+                            {% endfor %}
+                            </ul>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <div class="well well-sm">
+                            {{ part.result }}
+                        </div>
+                        {% if part.details %}
+                            <div class="well well-sm">
+                                {{ part.details }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}

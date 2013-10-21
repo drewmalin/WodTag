@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>WOD TAG</title>
+
+        <!-- FAVICON -->
+
+        <!-- STYLE -->
+        <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style/signin.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='tag-it/css/jquery.tagit.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='tag-it/css/tagit.ui-zendesk.css') }}">
+
+        <!-- JS -->
+        <script src="http://code.jquery.com/jquery-1.10.2.min.js"></script>
+        <script src="http://code.jquery.com/ui/1.10.3/jquery-ui.min.js"></script>
+        <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
+        <script src="{{ url_for('static', filename='tag-it/js/tag-it.js') }}"></script>
+
+    </head>
+    <body>
+        <!-- COMMON NAV -->
+        <nav class="navbar navbar-default navbar-fixed-top" role="navigation">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="/">#WodTag</a>
+            </div>
+            <div class="collapse navbar-collapse navbar-ex1-collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    {% if user %}
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{{ user.username }} <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="/user/{{ user.id }}">Profile</a></li>
+                            {% if user.member_of_gym %}
+                                <li><a href="/gym/{{ user.member_of_gym.id }}">Gym</a></li>
+                            {% endif %}
+                            <li role="presentation" class="divider"></li>
+                            <li><a href="#" onclick="document.getElementById('logout').submit()">Sign Out</a></li>
+                            <li>
+                                <form id="logout" action="{{ url_for('index') }}" method="post">
+	                                <input type="hidden" value="logout" name="logout" />
+                                </form>
+                            </li>
+                        </ul>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </nav>
+
+        <!-- FLASH MESSAGES -->
+        {% with errors = get_flashed_messages(category_filter=["error"]) %}
+        {% if errors %}
+            {% for message in errors %}
+                <div class="alert alert-danger alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    <strong>Error: </strong>{{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        {% with successes = get_flashed_messages(category_filter=["success"]) %}
+        {% if successes %}
+            {% for message in successes %}
+                <div class="alert alert-success alert-dismissable">
+                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+        {% endwith %}
+        <!-- CONTENT -->
+        {% block body %}
+        {% endblock %}
+    </body>
+</html>

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container">
+    <form class="form-signin" action="{{ url_for('user_mod') }}" method="POST">
+        <h2 class="form-signin-heading">Sign up</h2>
+        <input type="text" class="form-control" name="username" placeholder="Username" autofocus/><br>
+        <input type="password" class="form-control" name="password" placeholder="Password"/><br>
+        <input type="password" class="form-control" name="password2" placeholder="Repeat password"/>
+        <div class="radio">
+            <label>
+                <input type="radio" name="user_type" value="member" checked/>
+                Affiliate Member
+            </label>
+        </div>
+        <div class="radio">
+            <label>
+                <input type="radio" name="user_type" value="owner"/>
+                Affiliate Owner
+            </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Sign up</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block body %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    $(document).ready(function() {
+        $(".readOnlyTags").css("border", "0px");
+        $(".readOnlyTags").css("display", "inline-block");
+        $(".readOnlyTags").css("margin-bottom", "0px");
+    });
+    $(function() {
+        $('.readOnlyTags').tagit({
+            readOnly: true
+        });
+    });
+</script>
+{% if gym %}
+    <div class="container">
+        <div class="page-header">
+            <h1>{{ gym.name }}
+                <span class="btn-group">
+                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                        <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                    </button>
+                    <ul class="dropdown-menu">
+                        {% if user_is_owner %}
+                            <li><a href="/gym/edit/{{ gym.id }}">Edit Gym</a></li>
+                            <li><a href="{{ url_for('workout_template_mod') }}">Create Template Workout</a></li>
+                            <li role="presentation" class="divider"></li>
+                        {% endif %}
+                        {% if not user.is_gym_owner and not user.member_of_gym %}
+                            <li><a href="#" onclick="document.getElementById('join').submit()">Join Gym</a></li>
+                            <li>
+                                <form id="join" action="/gym/{{ gym.id }}" method="post">
+                                    <input type="hidden" value="join" name="join"/>
+                                </form>
+                            </li>
+                            <li role="presentation" class="divider"></li>
+                        {% endif %}
+                        <li><a href="/gym/{{ gym.id }}/members/">View Members</a></li>
+                        <li><a href="/gym/{{ gym.id }}/owners/">View Owners</a></li>
+                    </ul>
+                </span>
+            </h1>
+        </div>
+        <hr>
+        <h2>Workouts:</h2>
+        <div class="row">
+            {% for workout in gym.template_workouts %}
+                <div class="col-6 col-sm-6 col-lg-4">
+                    <div class="well well-sm">
+                        <h4>
+                            {{ workout.name }}
+                            <span class="btn-group pull-right">
+                                <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% if user_is_owner %}
+                                        <li><a href="#">Edit Workout</a></li>
+                                        <li role="presentation" class="divider"></li>
+                                    {% endif %}
+                                    {% if user_is_member %}
+                                        {% if workout.id in user_posted_results %}
+                                            <li><a href="/result/{{ user_posted_results[workout.id] }}">View Result</a></li>
+                                        {% else %}
+                                            <li><a href="/result/edit?wid={{ workout.id }}">Post Result</a></li>
+                                        {% endif %}
+                                        <li role="presentation" class="divider"></li>
+                                    {% endif %}
+                                    <li><a href="/workout_template/{{ workout.id }}/results/">View Gym Results</a></li>
+                                </ul>
+                            </span>
+                        </h4>
+                        <p class="text-muted">{{ workout.post_date.strftime("%b %d %Y") }}</p>
+                        {% for part in workout.parts %}
+                            <div class="well well-sm">
+                                <div class="maintain-newline">{{ part.description }}</div>
+                                {% if part.tags %}
+                                    <br />
+                                    <ul class="readOnlyTags tag-box">
+                                    {% for tag in part.tags %}
+                                        <li>{{ tag.name }}</li>
+                                    {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+{% else %}
+    <h3>(Gym) Error!</h3>
+{% endif %}
+</div>
+{% endblock %}

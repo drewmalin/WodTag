@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block body %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    $(document).ready(function() {
+        $(".readOnlyTags").css("border", "0px");
+        $(".readOnlyTags").css("display", "inline-block");
+        $(".readOnlyTags").css("margin-bottom", "0px");
+    });
+    $(function() {
+        $('.readOnlyTags').tagit({
+            readOnly: true
+        });
+    });
+</script>
+<div class="container">
+    <div class="page-header">
+        <h1>Record Workout Result</h1>
+        <h3>{{ workout.name }}</h3>
+        <h5 class="pull-right"><a href="/gym/{{workout.gym.id}}">{{ workout.gym.name }}</a></h5>
+        <p class="text-muted">{{ workout.post_date.strftime("%b %d %Y") }}</p>
+    </div>
+    <form role="form" id="result-form" action="{{ url_for('result_mod') }}" method="POST">
+        {% for part in workout.parts %}
+            <div class="row">
+                <div class="well well-sm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="maintain-newline" style="padding-left:8px">{{ part.description }}</div>
+                            {% if part.tags %}
+                                <br />
+                                <ul class="readOnlyTags">
+                                    {% for tag in part.tags %}
+                                        <li>{{ tag.name }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label for="result">Result <font color="red">*</font></label>
+                                <input id="result" name="result_{{ part.order }}" type="text" class="form-control" placeholder="{{ part.uom }}"/>
+                            </div>
+                             <div class="form-group">
+                                <label for="details">Details</label>
+                                <textarea id="details" name="detail_{{ part.order }}" class="form-control form-workout-textarea" rows="3"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <input value="{{ workout.id }}" name="workout_id" type="hidden" />
+        <input class="btn btn-lg btn-primary" name="submit" type="submit" value="Submit"/>
+    </form>
+</div>
+{% endblock %}

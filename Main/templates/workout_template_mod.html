@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block body %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    var counter=1;
+    $(function() {
+        $('#add_part').click(function() {
+            counter+=1
+            $('.remove_part:disabled').removeAttr('disabled');
+            var part = $('.parts:first').clone(true);
+            part.children('textarea').attr('name', 'parts['+(counter)+'][part]').val('');
+            part.children('button').attr('name', 'remove_'+(counter));
+            part.children('select').attr('name', 'parts['+(counter)+'][uom]');
+            part.children('input').remove();
+            part.children('ul').remove();
+
+            var tag = document.createElement('input');
+            tag.id = 'tags_'+(counter);
+            $(tag).appendTo($(part));
+
+            part.children('input').attr('name', 'parts['+(counter)+'][tags]').tagit({
+                tagSource: function(search, response) {
+                    var that = this;
+                    $.ajax({
+                        url: "/api/tags/",
+                        dataType: "json",
+                        data: {
+                            q : search.term
+                        },
+                        success: function(data) {
+                            response( $.map(data.tags, function(tag) {
+                                return {
+                                    label: tag.text,
+                                    value: tag.text
+                                }
+                            }));
+                        }
+                    });
+                }
+            });
+            $('.parts:last').after(part);
+        });
+        $('.remove_part').click(function() {
+            $(this).closest('.parts').remove();
+            $('.remove_part').attr('disabled', ($('.parts').length < 2));
+        });
+        $("#tags_1").tagit({
+            tagSource: function(search, response) {
+                    var that = this;
+                    $.ajax({
+                        url: "/api/tags/",
+                        dataType: "json",
+                        data: {
+                            q : search.term
+                        },
+                        success: function(data) {
+                            response( $.map(data.tags, function(tag) {
+                                return {
+                                    label: tag.text,
+                                    value: tag.text
+                                }
+                            }));
+                        }
+                    });
+                }
+        });
+    });
+</script>
+<div class="container">
+    <div class="page-header">
+        <h1>Create Workout</h1>
+    </div>
+    <form class="form-workout" role="form" id="workout-form" action="{{ url_for('workout_template_mod') }}" method="POST">
+        <div class="form-group">
+            <label for="workout-name">Workout name  <font color="red">*</font></label>
+            <input id="workout-name" class="form-control" name="workout_name" type="text" size="128"/><br>
+        </div>
+        <div class="form-group">
+            <label for="workout-date">Date <font color="red">*</font></label>
+            <input id="workout-date" class="form-control" name="workout_date" type="date"/><br>
+        </div>
+        <div class="form-group">
+            <label for="add_part">Parts</label>
+            <br>
+            <input class="btn" type="button" id="add_part" value="Add Part" size="64"/>
+            <div class="parts">
+                <br />
+                <textarea name="parts[1][part]" class="form-control form-workout-textarea" placeholder="Description" rows="3"></textarea>
+
+                <button  class="remove_part " disabled="disabled">
+                    <span class="glyphicon glyphicon-remove"></span>
+                </button>
+                <label for="uom">Unit of measurement</label>
+                <select id="uom" class="form-control" name="parts[1][uom]">
+                    <option value="pounds">Pounds</option>
+                    <option value="rounds">Rounds</option>
+                    <option value="time">Time</option>
+                </select>
+                <br />
+                <label for="tags_1">Tags</label>
+                <input id="tags_1" name="parts[1][tags]"/>
+            </div>
+        </div>
+        <br>
+        <input class="btn btn-lg btn-primary" name="submit" type="submit" value="Submit"/>
+    </form>
+</div>
+{% endblock %}

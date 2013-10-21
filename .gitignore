@@ -34,3 +34,12 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
+
+# additional
+*.idea
+*.DS_STORE
+*.sqlite
+venv/
+Main/static/bootstrap-3.0.0/
+Main/static/img/
+Main/static/tag-it/

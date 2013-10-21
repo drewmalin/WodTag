@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block body %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    $(document).ready(function() {
+        $(".readOnlyTags").css("border", "0px");
+        $(".readOnlyTags").css("display", "inline-block");
+        $(".readOnlyTags").css("margin-bottom", "0px");
+    });
+    $(function() {
+        $('.readOnlyTags').tagit({
+            readOnly: true
+        });
+    });
+</script>
+<div class="container">
+    <div class="page-header">
+        <h3>All Results for <a href="/workout_template/{{ workout.id }}">{{ workout.name }}</a></h3>
+        <h5 class="pull-left text-muted">{{ workout.post_date.strftime("%b %d %Y") }}</h5>
+        <h4 class="pull-right"><a href="/gym/{{ workout.gym.id }}">{{ workout.gym.name }}</a></h4>
+    </div>
+    <div class="form-workout">
+        {% for part in workout.parts %}
+            <div class="well well-sm">
+                <div class="maintain-newline">{{ part.description }}</div>
+                {% if part.tags %}
+                    <br />
+                    <ul class="readOnlyTags">
+                    {% for tag in part.tags %}
+                        <li>{{ tag.name }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <hr>
+    <div class="col-6 col-sm-6 col-lg-4">
+        {% for result in workout.results %}
+            <div class="well well-sm">
+                <h4><a href="/result/{{ result.id }}">{{ result.user.username}}</a></h4>
+                <ul>
+                    {% for part in result.parts %}
+                        <li>{{ part.result }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
