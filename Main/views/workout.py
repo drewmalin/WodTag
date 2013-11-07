@@ -6,44 +6,84 @@ import flask_login
 import flask.views
 
 
-class WorkoutTemplateView(flask.views.MethodView):
-    def get(self, workout_template_id):
-        if workout_template_id is not None and session.query(Workout).get(workout_template_id) is not None:
-            workout = session.query(Workout).get(workout_template_id)
-            if workout is not None:
-                return flask.render_template('workout_template.html', workout=workout, user=flask_login.current_user)
-        return flask.render_template('404.html'), 404
-
-
-class WorkoutTemplateMod(flask.views.MethodView):
+## All Workouts
+class Workouts(flask.views.MethodView):
     def get(self):
-        return flask.render_template('workout_template_mod.html')
+        workouts = session.query(Workout).all()
+        pass
 
     def post(self):
-        if WorkoutTemplateMod.validate_user_data() != 0:
-            return flask.redirect(flask.url_for('workout_template_mod'))
+        return WorkoutCRUD.create_workout()
 
-        parts = WorkoutTemplateMod.collect_parts()
 
-        workout = Workout(flask.request.form['workout_name'])
-        workout.post_date = datetime.datetime.strptime(flask.request.form['workout_date'], '%Y-%m-%d').date()
-        workout.gym = flask_login.current_user.owns_gym
+## Workout CREATE View
+class WorkoutCreate(flask.views.MethodView):
+    def get(self):
+        return flask.render_template('workout_create.html')
 
-        for idx in parts:
-            part = WorkoutPart(parts[idx]['name'])
-            part.order = idx
-            part.uom = parts[idx]['uom']
-            for tag_name in parts[idx]['tags'].split(','):
-                if tag_name != "":
-                    tag = session.query(Tag).filter_by(name=tag_name).first()
-                    if tag is None:
-                        tag = Tag(tag_name)
-                    part.tags.append(tag)
-            workout.parts.append(part)
 
-        session.add(workout)
-        session.commit()
-        return flask.redirect(flask.url_for('workout_template', workout_template_id=workout.id))
+## Workout EDIT View
+class WorkoutEdit(flask.views.MethodView):
+    def get(selfself, workout_id):
+        if workout_id is not None:
+            workout = session.query(Workout).get(workout_id)
+            return flask.render_template('workout_edit.html', workout=workout)
+        else:
+            return flask.render_template('404.html'), 404
+
+
+## Workout CRUD
+class WorkoutCRUD(flask.views.MethodView):
+    def get(self, workout_id):
+        if workout_id is not None and session.query(Workout).get(workout_id) is not None:
+            workout = session.query(Workout).get(workout_id)
+            if workout is not None:
+                return flask.render_template('workout.html', workout=workout, user=flask_login.current_user)
+        return flask.render_template('404.html'), 404
+
+    def post(self, workout_id):
+        method = flask.request.form.get('_method', '')
+        if method == "PUT":
+            pass
+        elif method == "DELETE":
+            pass
+        else:
+            return flask.render_template('404.html'), 404
+
+    @staticmethod
+    def edit_workout(workout_id):
+        pass
+
+    @staticmethod
+    def delete_workout(workout_id):
+        pass
+
+    @staticmethod
+    def create_workout():
+        if WorkoutCRUD.validate_user_data() != 0:
+            return flask.redirect(flask.url_for('workout_create'))
+        else:
+            parts = WorkoutCRUD.collect_parts()
+
+            workout = Workout(flask.request.form['workout_name'])
+            workout.post_date = datetime.datetime.strptime(flask.request.form['workout_date'], '%Y-%m-%d').date()
+            workout.gym = flask_login.current_user.owns_gym
+
+            for idx in parts:
+                part = WorkoutPart(parts[idx]['name'])
+                part.order = idx
+                part.uom = parts[idx]['uom']
+                for tag_name in parts[idx]['tags'].split(','):
+                    if tag_name != "":
+                        tag = session.query(Tag).filter_by(name=tag_name).first()
+                        if tag is None:
+                            tag = Tag(tag_name)
+                        part.tags.append(tag)
+                workout.parts.append(part)
+
+            session.add(workout)
+            session.commit()
+            return flask.redirect(flask.url_for('workout', workout_id=workout.id))
 
     @staticmethod
     def collect_parts():
@@ -69,10 +109,11 @@ class WorkoutTemplateMod(flask.views.MethodView):
             error += 1
         return error
 
-class WorkoutTemplateResults(flask.views.MethodView):
-    def get(self, workout_template_id):
-        if workout_template_id is not None and session.query(Workout).get(workout_template_id) is not None:
-            workout = session.query(Workout).get(workout_template_id)
+
+class WorkoutResults(flask.views.MethodView):
+    def get(self, workout_id):
+        if workout_id is not None and session.query(Workout).get(workout_id) is not None:
+            workout = session.query(Workout).get(workout_id)
             if workout is not None:
-                return flask.render_template('workout_template_results.html', workout=workout, user=flask_login.current_user)
+                return flask.render_template('workout_results.html', workout=workout, user=flask_login.current_user)
         return flask.render_template('404.html'), 404

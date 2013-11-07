@@ -53,14 +53,20 @@ app.add_url_rule('/gym/<int:gym_id>/owners/',
                  methods=['GET'])
 
 ## -------------- WORKOUT ----------------- ##
-app.add_url_rule('/workout_template/<int:workout_template_id>',
-                 view_func=WorkoutTemplateView.as_view('workout_template'),
-                 methods=['GET'])
-app.add_url_rule('/workout_template/edit/',
-                 view_func=WorkoutTemplateMod.as_view('workout_template_mod'),
+app.add_url_rule('/workouts/',
+                 view_func=Workouts.as_view('workouts'),
                  methods=['GET', 'POST'])
-app.add_url_rule('/workout_template/<int:workout_template_id>/results/',
-                 view_func=WorkoutTemplateResults.as_view('workout_template_results'),
+app.add_url_rule('/workout/<int:workout_id>',
+                 view_func=WorkoutCRUD.as_view('workout'),
+                 methods=['GET', 'POST'])
+app.add_url_rule('/workout/create',
+                 view_func=WorkoutCreate.as_view('workout_create'),
+                 methods=['GET'])
+app.add_url_rule('/workout/edit/<int:workout_id>',
+                 view_func=WorkoutEdit.as_view('workout_edit'),
+                 methods=['GET'])
+app.add_url_rule('/workout_template/<int:workout_id>/results/',
+                 view_func=WorkoutResults.as_view('workout_results'),
                  methods=['GET'])
 
 ## -------------- RESULTS -------------- ##

@@ -23,7 +23,7 @@
                     <ul class="dropdown-menu">
                         {% if user_is_owner %}
                             <li><a href="{{ url_for('gym_edit', gym_id=gym.id) }}">Edit Gym</a></li>
-                            <li><a href="{{ url_for('workout_template_mod') }}">Create Template Workout</a></li>
+                            <li><a href="{{ url_for('workout_create') }}">Create Template Workout</a></li>
                             <li role="presentation" class="divider"></li>
                         {% endif %}
                         {% if not user.is_gym_owner and not user.member_of_gym %}
@@ -65,7 +65,7 @@
                                         {% endif %}
                                         <li role="presentation" class="divider"></li>
                                     {% endif %}
-                                    <li><a href="/workout_template/{{ workout.id }}/results/">View Gym Results</a></li>
+                                    <li><a href="{{ url_for('workout_results', workout_id=workout.id) }}">View Gym Results</a></li>
                                 </ul>
                             </span>
                         </h4>

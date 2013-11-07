@@ -14,7 +14,7 @@
 </script>
 <div class="container">
     <div class="page-header">
-        <h3>All Results for <a href="/workout_template/{{ workout.id }}">{{ workout.name }}</a></h3>
+        <h3>All Results for <a href="{{ url_for('workout', workout_id=workout.id) }}">{{ workout.name }}</a></h3>
         <h5 class="pull-left text-muted">{{ workout.post_date.strftime("%b %d %Y") }}</h5>
         <h4 class="pull-right"><a href="{{ url_for('gym', gym_id=workout.gym.id) }}">{{ workout.gym.name }}</a></h4>
     </div>
