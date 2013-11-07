@@ -2,14 +2,14 @@
 {% block body %}
 <div class="container">
     {% if gym %}
-    <div class="page-header">
-        <h1>Members of: <a href="/gym/{{ gym.id }}">{{ gym.name }}</a></h1>
-        <ul>
-            {% for member in gym.members %}
-                <li><a href="/user/{{ member.id }}">{{ member.username }}</a></li>
-            {% endfor %}
-        </ul>
-    </div>
+        <div class="page-header">
+            <h1>Members of: <a href="{{ url_for('gym', gym_id=gym.id) }}">{{ gym.name }}</a></h1>
+            <ul>
+                {% for member in gym.members %}
+                    <li><a href="{{ url_for('user', user_id=member.id) }}">{{ member.username }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
     {% else %}
         <h3>(Gym Members) Error!</h3>
     {% endif %}

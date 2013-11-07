@@ -6,13 +6,13 @@
     </div>
     {% for gym in gyms %}
         <div class="well well-sm">
-            <h4 class="pull-left"><a href="/gym/{{ gym.id }}">{{ gym.name }}</a></h4>
-            <h5 class="pull-right">Members: <a href="/gym/{{ gym.id }}/members/">{{ gym.members|length }}</a></h5>
+            <h4 class="pull-left"><a href="{{ url_for('gym', gym_id=gym.id) }}">{{ gym.name }}</a></h4>
+            <h5 class="pull-right">Members: <a href="{{ url_for('gym_members', gym_id=gym.id) }}/members/">{{ gym.members|length }}</a></h5>
             <br /><br />
             <h5>Owners: </h5>
             <ul>
                 {% for owner in gym.owners %}
-                    <li><a href="/user/{{ owner.id }}">{{ owner.username }}</a></li>
+                    <li><a href="{{ url_for('user', user_id=owner.id) }}">{{ owner.username }}</a></li>
                 {% endfor %}
             </ul>
         </div>

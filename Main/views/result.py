@@ -6,7 +6,37 @@ import flask_login
 import flask.views
 
 
-class ResultView(flask.views.MethodView):
+## All Results
+class Results(flask.views.MethodView):
+    def get(self):
+        results = session.query(Results).all()
+        pass
+
+    def post(self):
+        return ResultCRUD.create_result()
+
+
+## Result CREATE View
+class ResultCreate(flask.views.MethodView):
+    def get(self, workout_id):
+        if workout_id is not None:
+            workout = session.query(Workout).get(workout_id)
+            return flask.render_template('result_create.html', workout=workout)
+        else:
+            return flask.render_template('404.html'), 404
+
+
+## Result EDIT View
+class ResultEdit(flask.views.MethodView):
+    def get(self, result_id):
+        if result_id is not None:
+            result = session.query(WorkoutResult).get(result_id)
+            return flask.render_template('result_edit.html', result=result)
+        else:
+            return flask.render_template('404.html'), 404
+
+## Result CRUD
+class ResultCRUD(flask.views.MethodView):
     def get(self, result_id):
         if result_id is not None and session.query(WorkoutResult).get(result_id) is not None:
             result = session.query(WorkoutResult).get(result_id)
@@ -14,59 +44,78 @@ class ResultView(flask.views.MethodView):
                 return flask.render_template('result.html', user=flask_login.current_user, result=result)
         return flask.render_template('404.html'), 404
 
-
-class ResultMod(flask.views.MethodView):
-    def get(self, result_id):
-        workout = session.query(Workout).get(int(flask.request.args['wid']))
-        if workout is not None:
-            return flask.render_template('result_mod.html', user=flask_login.current_user, workout=workout)
-        return flask.render_template('404.html'), 404
-
     def post(self, result_id):
-        workout = session.query(Workout).get(int(flask.request.form['workout_id']))
-        if workout is None:
+        method = flask.request.form.get('_method', '')
+        if method == "PUT":
+            return ResultCRUD.edit_result(result_id)
+        elif method == "DELETE":
+            return ResultCRUD.delete_result(result_id)
+        else:
             return flask.render_template('404.html'), 404
-        if ResultMod.validate_result_data() != 0:
-            return flask.redirect(flask.url_for('result_mod', wid=workout.id))
 
+    @staticmethod
+    def edit_result(result_id):
+        workout_id = flask.request.form['workout_id']
+        if ResultCRUD.validate_result_create(workout_id) != 0:
+            return flask.redirect(flask.url_for('result_create', workout_id=workout_id))
+        else:
+            result = session.query(WorkoutResult).get(result_id)
+            for part in result.parts:
+                part.result = flask.request.form['result_'+part.order]
+                part.details = flask.request.form['detail_'+part.order]
+            session.commit()
+            flask.flash("Successfully updated workout result!", "success")
+            return flask.redirect(flask.url_for('result', result_id=result_id))
+
+    @staticmethod
+    def delete_result(result_id):
+        pass
+
+    @staticmethod
+    def create_result():
+        workout_id = flask.request.form['workout_id']
+        if ResultCRUD.validate_result_create(workout_id) != 0:
+            return flask.redirect(flask.url_for('result_create', workout_id=workout_id))
+        else:
+            result = WorkoutResult()
+            result.user = flask_login.current_user
+            result.workout_id = workout_id
+            for part in session.query(Workout).get(workout_id).parts:
+                result_data = flask.request.form['result_'+part.order]
+                result_details = flask.request.form['detail_'+part.order]
+                part_result = WorkoutPartResult(result_data)
+                part_result.order = part.order
+                part_result.part = part
+                part_result.details = result_details
+                result.parts.append(part_result)
+            session.add(result)
+            session.commit()
+            flask.flash("Successfully recorded workout!", "success")
+            return flask.redirect(flask.url_for('result', result_id=result.id))
+
+
+    @staticmethod
+    def validate_result_create(workout_id):
+        error = 0
+        if workout_id == "":
+            flask.flash("Unable to create result for null workout!", "error")
+            error += 1
+        workout = session.query(Workout).get(int(workout_id))
         for part in workout.parts:
             if flask.request.form.get('result_'+part.order) == "":
                 flask.flash("All parts require results!", "error")
-                return flask.redirect(flask.url_for('result_mod', wid=workout.id))
+                error += 1
             if part.uom.lower() == "rounds":
                 if not flask.request.form.get('result_' + part.order).isdigit():
                     flask.flash("Round result must be a number!", "error")
-                    return flask.redirect(flask.url_for('result_mod', wid=workout.id))
+                    error += 1
             elif part.uom.lower() == "pounds":
                 if not flask.request.form.get('result_' + part.order).isdigit():
                     flask.flash("Pound result must be a number!", "error")
-                    return flask.redirect(flask.url_for('result_mod', wid=workout.id))
+                    error += 1
             elif part.uom.lower() == "time":
                 regex = re.compile('\d{2}:\d{2}(:\d{2})?')
                 if regex.match(flask.request.form.get('result_' + part.order)) is None:
                     flask.flash("Time result must be in the following format: mm:ss or hh:mm:ss!", "error")
-                    return flask.redirect(flask.url_for('result_mod', wid=workout.id))
-
-        result = WorkoutResult()
-        result.user = flask_login.current_user
-        result.workout_id = workout.id
-
-        for part in workout.parts:
-            result_data = flask.request.form['result_'+part.order]
-            result_details = flask.request.form['detail_'+part.order]
-            part_result = WorkoutPartResult(result_data)
-            part_result.part = part
-            part_result.details = result_details
-            result.parts.append(part_result)
-
-        session.add(result)
-        session.commit()
-        return flask.redirect(flask.url_for('known_result', result_id=result.id))
-
-    @staticmethod
-    def validate_result_data():
-        error = 0
-        if flask.request.form['workout_id'] == "":
-            flask.flash("Unknown error!", "error")
-            error += 1
+                    error += 1
         return error

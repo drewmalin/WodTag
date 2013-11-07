@@ -107,7 +107,7 @@ class WorkoutResult(Base):
     user_id = Column(Integer, ForeignKey('User.id'))
     workout_id = Column(Integer, ForeignKey('Workout.id'))
     user = relationship('User', backref='results')
-    parts = relationship('WorkoutPartResult', backref='workout_result')
+    parts = relationship('WorkoutPartResult', backref='workout_result', order_by='WorkoutPartResult.order')
 
 ###
 # Workout part results are owned by WorkoutResults
@@ -117,6 +117,7 @@ class WorkoutPartResult(Base):
     id = Column(Integer, primary_key=True)
     result = Column(String(128))
     details = Column(String(512))
+    order = Column(String(64))
 
     part_id = Column(Integer, ForeignKey('WorkoutPart.id'))
     part = relationship('WorkoutPart', backref='results')

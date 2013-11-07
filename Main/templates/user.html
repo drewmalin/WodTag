@@ -12,16 +12,16 @@
                             <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
                         </button>
                         <ul class="dropdown-menu">
-                            <li><a href="/gym/user/{{ user.id }}">Edit Profile</a></li>
+                            <li><a href="{{ url_for('user_edit', user_id=user.id) }}">Edit Profile</a></li>
                             <li role="presentation" class="divider"></li>
                             {% if user.member_of_gym %}
-                                <li><a href="/gym/{{ user.member_of_gym.id }}">View Gym</a></li>
+                                <li><a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">View Gym</a></li>
                             {% elif user.owns_gym %}
-                                <li><a href="/gym/{{ user.owns_gym.id }}">View Gym</a></li>
+                                <li><a href="{{ url_for('gym', gym_id=user.owns_gym.id) }}">View Gym</a></li>
                             {% elif viewed_user.is_gym_owner %}
-                                <li><a href="{{ url_for('gym_mod') }}">Create Gym</a></li>
+                                <li><a href="{{ url_for('gym_create') }}">Create Gym</a></li>
                             {% else %}
-                                 <li><a href="/all_gyms/">Find Gym</a></li>
+                                 <li><a href="{{ url_for('gyms') }}">Find Gym</a></li>
                             {% endif %}
                         </ul>
                     </span>
@@ -30,14 +30,14 @@
         </div>
         {% if viewed_user.is_gym_owner %}
             {% if viewed_user.owns_gym %}
-                <h3>Owner of: <a href="/gym/{{ viewed_user.owns_gym.id }}">{{ viewed_user.owns_gym.name }}</a></h3>
+                <h3>Owner of: <a href="{{ url_for('gym', gym_id=viewed_user.owns_gym.id) }}">{{ viewed_user.owns_gym.name }}</a></h3>
                 <hr>
                 <h3>Recent recorded results:</h3>
                 {% for member in viewed_user.owns_gym.members %}
                     {% for result in member.results %}
                         <div class="well well-sm">
-                            <h4 class="pull-left"><a href="/result/{{ result.id }}">{{ result.workout.name }}</a></h4>
-                            <h5 class="pull-right">Posted by: <a href="/user/{{ member.id }}">{{ member.username }}</a></h5>
+                            <h4 class="pull-left"><a href="{{ url_for('result', result_id=result.id) }}">{{ result.workout.name }}</a></h4>
+                            <h5 class="pull-right">Posted by: <a href="{{ url_for('user', user_id=member.id) }}">{{ member.username }}</a></h5>
                             <br /><br />
                             <p class="text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</p>
                         </div>
@@ -60,8 +60,8 @@
                 <h3>Recent results:</h3>
                 {% for result in viewed_user.results %}
                     <div class="well well-sm">
-                        <h4 class="pull-left"><a href="/result/{{ result.id }}">{{ result.workout.name }}</a></h4>
-                        <h5 class="pull-right">Posted for: <a href="/gym/{{ result.workout.gym.id }}">{{ result.workout.gym.name }}</a></h5>
+                        <h4 class="pull-left"><a href="{{ url_for('result', result_id=result.id) }}">{{ result.workout.name }}</a></h4>
+                        <h5 class="pull-right">Posted for: <a href="{{ url_for('gym', gym_id=result.workout.gym.id) }}">{{ result.workout.gym.name }}</a></h5>
                         <br /><br />
                         <p class="text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</p>
                     </div>

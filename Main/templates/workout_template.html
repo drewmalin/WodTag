@@ -16,7 +16,7 @@
     {% if workout %}
         <div class="page-header">
             <h3>Workout name: {{ workout.name }}</h3>
-            <h4 class="pull-right"><a href="/gym/{{workout.gym.id}}">{{ workout.gym.name }}</a></h4>
+            <h4 class="pull-right"><a href="{{ url_for('gym', gym_id=workout.gym.id) }}">{{ workout.gym.name }}</a></h4>
             <h5 class="text-muted">{{ workout.post_date.strftime("%b %d %Y") }}</h5>
         </div>
         <hr>

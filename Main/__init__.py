@@ -11,6 +11,7 @@ from Main.views.gym import *
 from Main.views.workout import *
 from Main.views.result import *
 from Main.views.api import *
+from Main.views.search import *
 
 ## ------------ INDEX -------------- ##
 app.add_url_rule('/',
@@ -18,39 +19,40 @@ app.add_url_rule('/',
                  methods=['GET', 'POST'])
 
 ## ------------ USER -------------- ##
-app.add_url_rule('/user/',
-                 defaults={'user_id': None},
-                 view_func=UserView.as_view('user'),
+app.add_url_rule('/users/',
+                 view_func=Users.as_view('users'),
                  methods=['GET', 'POST'])
 app.add_url_rule('/user/<int:user_id>',
-                 view_func=UserView.as_view('known_user'),
+                 view_func=UserCRUD.as_view('user'),
                  methods=['GET', 'POST'])
-app.add_url_rule('/user/edit',
-                 defaults={'user_id': None},
-                 view_func=UserMod.as_view('user_mod'),
-                 methods=['GET', 'POST'])
+app.add_url_rule('/user/create',
+                 view_func=UserCreate.as_view('user_create'),
+                 methods=['GET'])
 app.add_url_rule('/user/edit/<int:user_id>',
-                 view_func=UserMod.as_view('known_user_mod'),
-                 methods=['GET', 'POST'])
+                 view_func=UserEdit.as_view('user_edit'),
+                 methods=['GET'])
 
 ## ------------ GYM -------------- ##
-app.add_url_rule('/all_gyms/',
-                 view_func=AllGymsView.as_view('all_gyms'),
-                 methods=['GET'])
-app.add_url_rule('/gym/',
-                 defaults={'gym_id': None},
-                 view_func=GymView.as_view('gym'),
+app.add_url_rule('/gyms/',
+                 view_func=Gyms.as_view('gyms'),
                  methods=['GET', 'POST'])
 app.add_url_rule('/gym/<int:gym_id>',
-                 view_func=GymView.as_view('known_gym'),
+                 view_func=GymCRUD.as_view('gym'),
                  methods=['GET', 'POST'])
-app.add_url_rule('/gym/edit',
-                 defaults={'gym_id': None},
-                 view_func=GymMod.as_view('gym_mod'),
-                 methods=['GET', 'POST'])
+app.add_url_rule('/gym/create',
+                 view_func=GymCreate.as_view('gym_create'),
+                 methods=['GET'])
 app.add_url_rule('/gym/edit/<int:gym_id>',
-                 view_func=GymMod.as_view('known_gym_mod'),
-                 methods=['GET', 'POST'])
+                 view_func=GymEdit.as_view('gym_edit'),
+                 methods=['GET'])
+app.add_url_rule('/gym/<int:gym_id>/members/',
+                 view_func=AllGymMembersView.as_view('gym_members'),
+                 methods=['GET'])
+app.add_url_rule('/gym/<int:gym_id>/owners/',
+                 view_func=AllGymOwnersView.as_view('gym_owners'),
+                 methods=['GET'])
+
+## -------------- WORKOUT ----------------- ##
 app.add_url_rule('/workout_template/<int:workout_template_id>',
                  view_func=WorkoutTemplateView.as_view('workout_template'),
                  methods=['GET'])
@@ -60,31 +62,22 @@ app.add_url_rule('/workout_template/edit/',
 app.add_url_rule('/workout_template/<int:workout_template_id>/results/',
                  view_func=WorkoutTemplateResults.as_view('workout_template_results'),
                  methods=['GET'])
-app.add_url_rule('/gym/<int:gym_id>/members/',
-                 view_func=AllGymMembersView.as_view('gym_members'),
-                 methods=['GET'])
-app.add_url_rule('/gym/<int:gym_id>/owners/',
-                 view_func=AllGymOwnersView.as_view('gym_owners'),
-                 methods=['GET'])
 
-## ------------ WORKOUT -------------- ##
-app.add_url_rule('/result/',
-                 defaults={'result_id': None},
-                 view_func=ResultView.as_view('result'),
+## -------------- RESULTS -------------- ##
+app.add_url_rule('/results/',
+                 view_func=Results.as_view('results'),
                  methods=['GET', 'POST'])
 app.add_url_rule('/result/<int:result_id>',
-                 view_func=ResultView.as_view('known_result'),
+                 view_func=ResultCRUD.as_view('result'),
                  methods=['GET', 'POST'])
-app.add_url_rule('/result/edit/',
-                 defaults={'result_id': None},
-                 view_func=ResultMod.as_view('result_mod'),
-                 methods=['GET', 'POST'])
-app.add_url_rule('/result/edit/<int:workout_id>',
-                 view_func=ResultMod.as_view('known_result_mod'),
-                 methods=['GET', 'POST'])
+app.add_url_rule('/result/create/<int:workout_id>',
+                 view_func=ResultCreate.as_view('result_create'),
+                 methods=['GET'])
+app.add_url_rule('/result/edit/<int:result_id>',
+                 view_func=ResultEdit.as_view('result_edit'),
+                 methods=['GET'])
 
 ## -------------- API ---------------- ##
-
 app.add_url_rule('/api/tags/',
                  defaults={'tag_id': None},
                  view_func=TagsAPI.as_view('tags_api'),
@@ -92,6 +85,11 @@ app.add_url_rule('/api/tags/',
 app.add_url_rule('/api/tags/<int:tag_id>',
                  view_func=TagsAPI.as_view('known_tags_api'),
                  methods=['GET'])
+
+## ------------- SEARCH ---------------##
+app.add_url_rule('/search/',
+                 view_func=SearchView.as_view('search'),
+                 methods=['GET', 'POST'])
 
 ## ------------ DB Init -------------- ##
 from util import Base, engine

@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block body %}
+{% if result %}
+    <script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+        $(document).ready(function() {
+            $(".readOnlyTags").css("border", "0px");
+            $(".readOnlyTags").css("display", "inline-block");
+            $(".readOnlyTags").css("margin-bottom", "0px");
+        });
+        $(function() {
+            $('.readOnlyTags').tagit({
+                readOnly: true
+            });
+        });
+    </script>
+    <div class="container">
+        <div class="page-header">
+            <h1>Edit Workout Result</h1>
+            <h3>{{ result.workout.name }}</h3>
+            <h5 class="pull-right"><a href="{{ url_for('gym', gym_id=result.workout.gym.id) }}">{{ result.workout.gym.name }}</a></h5>
+            <p class="text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</p>
+        </div>
+        <form role="form" id="result-form" action="{{ url_for('result', result_id=result.id) }}" method="POST">
+            <input type="hidden" name="_method" value="PUT">
+            {% for part in result.parts %}
+                <div class="row">
+                    <div class="well well-sm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="maintain-newline" style="padding-left:8px">{{ part.part.description }}</div>
+                                {% if part.part.tags %}
+                                    <br />
+                                    <ul class="readOnlyTags">
+                                        {% for tag in part.part.tags %}
+                                            <li>{{ tag.name }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="result">Result <font color="red">*</font></label>
+                                    <input id="result" name="result_{{ part.part.order }}" type="text" class="form-control" value="{{ part.result }}" placeholder="{{ part.uom }}"/>
+                                </div>
+                                 <div class="form-group">
+                                    <label for="details">Details</label>
+                                    <textarea id="details" name="detail_{{ part.part.order }}" class="form-control form-workout-textarea" rows="3">{{ part.details }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            <input value="{{ result.workout.id }}" name="workout_id" type="hidden" />
+            <input class="btn btn-lg btn-primary" name="submit" type="submit" value="Submit"/>
+        </form>
+    </div>
+{% else %}
+    <h3>(Result) Error!</h3>
+{% endif %}
+{% endblock %}

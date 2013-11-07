@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% block body %}
 <div class="container">
-    <form class="form-signin" action="/" method="POST">
+    <form class="form-signin" action="{{ url_for('index') }}" method="POST">
         <h2 class="form-signin-heading">Sign in</h2>
         <input type="text" class="form-control" name="username" placeholder="Username" autofocus/><br>
         <input type="password" class="form-control" name="password" placeholder="Password"/><br>
         <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Sign in</button>
         <br>
-        <p>New user? Click <a href="{{ url_for('user_mod') }}">here</a>!</p>
+        <p>New user? Click <a href="{{ url_for('user_create') }}">here</a>!</p>
     </form>
 </div>
 {% endblock %}

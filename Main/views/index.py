@@ -9,7 +9,7 @@ import hashlib
 class Index(flask.views.MethodView):
     def get(self):
         if not flask_login.current_user.is_anonymous():
-            return flask.redirect(flask.url_for('known_user', user_id=flask_login.current_user.id))
+            return flask.redirect(flask.url_for('user', user_id=flask_login.current_user.id))
         else:
             flask_login.logout_user()
             return flask.render_template('index.html')
@@ -18,13 +18,30 @@ class Index(flask.views.MethodView):
         if 'logout' in flask.request.form:
             flask_login.logout_user()
             return flask.redirect(flask.url_for('index'))
+        else:
+            return Index.login_user()
+
+    @staticmethod
+    def login_user():
+        if Index.validate_login_data() != 0:
+            return flask.redirect(flask.url_for('index'))
+        else:
+            return Index.process_login()
+
+
+    @staticmethod
+    def validate_login_data():
+        error = 0
         if flask.request.form['username'] == "":
             flask.flash("Username is required!", "error")
-            return flask.redirect(flask.url_for('index'))
+            error += 1
         elif flask.request.form['password'] == "":
             flask.flash("Password is required!", "error")
-            return flask.redirect(flask.url_for('index'))
+            error += 1
+        return error
 
+    @staticmethod
+    def process_login():
         user = None
         user_name = flask.request.form['username'].strip()
         user_pass = flask.request.form['password']
@@ -38,4 +55,4 @@ class Index(flask.views.MethodView):
             return flask.redirect(flask.url_for('index'))
         else:
             flask_login.login_user(user)
-            return flask.redirect(flask.url_for('known_user', user_id=flask_login.current_user.id))
+            return flask.redirect(flask.url_for('user', user_id=flask_login.current_user.id))

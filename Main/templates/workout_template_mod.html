@@ -21,7 +21,7 @@
                 tagSource: function(search, response) {
                     var that = this;
                     $.ajax({
-                        url: "/api/tags/",
+                        url: "{{ url_for('tags_api') }}",
                         dataType: "json",
                         data: {
                             q : search.term
@@ -47,7 +47,7 @@
             tagSource: function(search, response) {
                     var that = this;
                     $.ajax({
-                        url: "/api/tags/",
+                        url: "{{ url_for('tags_api') }}",
                         dataType: "json",
                         data: {
                             q : search.term
