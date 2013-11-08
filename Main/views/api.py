@@ -1,5 +1,5 @@
 from Main.decorators import crossdomain
-from ..util import session
+from ..util import db
 from ..models import *
 import flask
 import flask.views
@@ -14,9 +14,9 @@ class TagsAPI(flask.views.MethodView):
             tag_list = []
 
             if not tag_filter:
-                tags = session.query(Tag).limit(10)
+                tags = Tag.query.limit(10).all()
             else:
-                tags = session.query(Tag).filter(Tag.name.contains(tag_filter)).limit(10)
+                tags = Tag.query.filter(Tag.name.contains(tag_filter)).limit(10).all()
 
             for tag in tags:
                 tag_list.append({'id': str(tag.id), 'text': tag.name})

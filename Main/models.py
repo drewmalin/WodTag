@@ -1,5 +1,4 @@
-from util import Base, lm, session
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, Boolean, DateTime
+from util import db, lm
 from sqlalchemy.orm import relationship
 import hashlib
 import random
@@ -7,27 +6,27 @@ import random
 ###
 # Many-to-many joiner table (WorkoutPart >--< Tag)
 #
-tag_part_association = Table('tag_part_association', Base.metadata,
-                             Column('part_id', Integer, ForeignKey('WorkoutPart.id')),
-                             Column('tag_id', Integer, ForeignKey('Tag.id')))
+tag_part_association = db.Table('tag_part_association',
+                                db.Column('part_id', db.Integer, db.ForeignKey('WorkoutPart.id')),
+                                db.Column('tag_id', db.Integer, db.ForeignKey('Tag.id')))
 
 ###
 # Many-to-many joiner table (WorkoutResult >---< Tag)
 #
-tag_result_association = Table('tag_result_association', Base.metadata,
-                               Column('result_id', Integer, ForeignKey('WorkoutResult.id')),
-                               Column('tag_id', Integer, ForeignKey('Tag.id')))
+tag_result_association = db.Table('tag_result_association',
+                                  db.Column('result_id', db.Integer, db.ForeignKey('WorkoutResult.id')),
+                                  db.Column('tag_id', db.Integer, db.ForeignKey('Tag.id')))
 
 
-class User(Base):
+class User(db.Model):
     __tablename__ = 'User'
-    id = Column(Integer, primary_key=True)
-    username = Column(String(128))
-    password = Column(String(128))
-    salt = Column(String(128))
-    is_gym_owner = Column(Boolean)
-    member_gym_id = Column(Integer, ForeignKey('Gym.id'))
-    owner_gym_id = Column(Integer, ForeignKey('Gym.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(128))
+    password = db.Column(db.String(128))
+    salt = db.Column(db.String(128))
+    is_gym_owner = db.Column(db.Boolean)
+    member_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
+    owner_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
 
     def __init__(self, username, password):
         self.username = username
@@ -48,13 +47,13 @@ class User(Base):
 
 @lm.user_loader
 def load_user(user_id):
-    return session.query(User).filter_by(id=int(user_id)).first()
+    return User.query.get(user_id)
 
-class Gym(Base):
+class Gym(db.Model):
     __tablename__ = 'Gym'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(128))
-    description = Column(String(512))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    description = db.Column(db.String(512))
 
     owners = relationship('User', backref='owns_gym', foreign_keys="User.owner_gym_id")
     members = relationship('User', backref='member_of_gym', foreign_keys="User.member_gym_id")
@@ -69,12 +68,12 @@ class Gym(Base):
 # which can be used to generate user-specific results. Workout templates are made
 # up of at least one part
 #
-class Workout(Base):
+class Workout(db.Model):
     __tablename__ = 'Workout'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(128))
-    post_date = Column(DateTime)
-    gym_id = Column(Integer, ForeignKey('Gym.id'))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128))
+    post_date = db.Column(db.DateTime)
+    gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
 
     parts = relationship('WorkoutPart', backref='workout', order_by='WorkoutPart.order')
     results = relationship('WorkoutResult', backref='workout')
@@ -85,14 +84,14 @@ class Workout(Base):
 ###
 # Pieces of a workout. Workouts are generally made up of two or three parts
 #
-class WorkoutPart(Base):
+class WorkoutPart(db.Model):
     __tablename__ = 'WorkoutPart'
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    description = Column(String(512))
-    workout_id = Column(Integer, ForeignKey('Workout.id'))
-    order = Column(String(64))
-    uom = Column(String(128))
+    description = db.Column(db.String(512))
+    workout_id = db.Column(db.Integer, db.ForeignKey('Workout.id'))
+    order = db.Column(db.String(64))
+    uom = db.Column(db.String(128))
 
     def __init__(self, description):
         self.description = description
@@ -100,28 +99,28 @@ class WorkoutPart(Base):
 ###
 # Workout results are owned by users
 #
-class WorkoutResult(Base):
+class WorkoutResult(db.Model):
     __tablename__ = 'WorkoutResult'
-    id = Column(Integer, primary_key=True)
+    id = db.Column(db.Integer, primary_key=True)
 
-    user_id = Column(Integer, ForeignKey('User.id'))
-    workout_id = Column(Integer, ForeignKey('Workout.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    workout_id = db.Column(db.Integer, db.ForeignKey('Workout.id'))
     user = relationship('User', backref='results')
     parts = relationship('WorkoutPartResult', backref='workout_result', order_by='WorkoutPartResult.order')
 
 ###
 # Workout part results are owned by WorkoutResults
 #
-class WorkoutPartResult(Base):
+class WorkoutPartResult(db.Model):
     __tablename__ = 'WorkoutPartResult'
-    id = Column(Integer, primary_key=True)
-    result = Column(String(128))
-    details = Column(String(512))
-    order = Column(String(64))
+    id = db.Column(db.Integer, primary_key=True)
+    result = db.Column(db.String(128))
+    details = db.Column(db.String(512))
+    order = db.Column(db.String(64))
 
-    part_id = Column(Integer, ForeignKey('WorkoutPart.id'))
+    part_id = db.Column(db.Integer, db.ForeignKey('WorkoutPart.id'))
     part = relationship('WorkoutPart', backref='results')
-    result_id = Column(Integer, ForeignKey('WorkoutResult.id'))
+    result_id = db.Column(db.Integer, db.ForeignKey('WorkoutResult.id'))
 
     def __init__(self, result):
         self.result = result
@@ -129,10 +128,10 @@ class WorkoutPartResult(Base):
 
 ###
 # Assigned directly to workout results by users or to workout parts by gyms
-class Tag(Base):
+class Tag(db.Model):
     __tablename__ = 'Tag'
-    id = Column(Integer, primary_key=True)
-    name = Column(String(64))
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(64))
     parts = relationship('WorkoutPart', secondary=tag_part_association, backref='tags')
     results = relationship('WorkoutResult', secondary=tag_result_association, backref='tags')
 

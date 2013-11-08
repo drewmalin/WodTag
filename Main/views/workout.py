@@ -1,5 +1,5 @@
 import datetime
-from ..util import session
+from ..util import db
 from ..models import *
 import flask
 import flask_login
@@ -26,7 +26,7 @@ class WorkoutCreate(flask.views.MethodView):
 class WorkoutEdit(flask.views.MethodView):
     def get(selfself, workout_id):
         if workout_id is not None:
-            workout = session.query(Workout).get(workout_id)
+            workout = Workout.query.get(workout_id)
             return flask.render_template('workout_edit.html', workout=workout)
         else:
             return flask.render_template('404.html'), 404
@@ -35,8 +35,8 @@ class WorkoutEdit(flask.views.MethodView):
 ## Workout CRUD
 class WorkoutCRUD(flask.views.MethodView):
     def get(self, workout_id):
-        if workout_id is not None and session.query(Workout).get(workout_id) is not None:
-            workout = session.query(Workout).get(workout_id)
+        if workout_id is not None and Workout.query.get(workout_id) is not None:
+            workout = Workout.query.get(workout_id)
             if workout is not None:
                 return flask.render_template('workout.html', workout=workout, user=flask_login.current_user)
         return flask.render_template('404.html'), 404
@@ -75,14 +75,14 @@ class WorkoutCRUD(flask.views.MethodView):
                 part.uom = parts[idx]['uom']
                 for tag_name in parts[idx]['tags'].split(','):
                     if tag_name != "":
-                        tag = session.query(Tag).filter_by(name=tag_name).first()
+                        tag = Tag.query.filter_by(name=tag_name).first()
                         if tag is None:
                             tag = Tag(tag_name)
                         part.tags.append(tag)
                 workout.parts.append(part)
 
-            session.add(workout)
-            session.commit()
+            db.session.add(workout)
+            db.session.commit()
             return flask.redirect(flask.url_for('workout', workout_id=workout.id))
 
     @staticmethod
@@ -112,8 +112,8 @@ class WorkoutCRUD(flask.views.MethodView):
 
 class WorkoutResults(flask.views.MethodView):
     def get(self, workout_id):
-        if workout_id is not None and session.query(Workout).get(workout_id) is not None:
-            workout = session.query(Workout).get(workout_id)
+        if workout_id is not None and Workout.query.get(workout_id) is not None:
+            workout = Workout.query.get(workout_id)
             if workout is not None:
                 return flask.render_template('workout_results.html', workout=workout, user=flask_login.current_user)
         return flask.render_template('404.html'), 404

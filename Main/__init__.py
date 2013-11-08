@@ -98,17 +98,17 @@ app.add_url_rule('/search/',
                  methods=['GET', 'POST'])
 
 ## ------------ DB Init -------------- ##
-from util import Base, engine
+from util import db
 from models import *
-Base.metadata.create_all(engine)
+db.create_all()
 
 ## ----------- Seed Data ------------- ##
 f = open("Main/data/tags.txt", "r")
 data = f.readlines()
 for line in data:
     line = line.strip()
-    tag = session.query(Tag).filter_by(name=line).first()
+    tag = Tag.query.filter_by(name=line).first()
     if tag is None:
         tag = Tag(line)
-    session.add(tag)
-session.commit()
+    db.session.add(tag)
+db.session.commit()

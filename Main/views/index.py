@@ -1,4 +1,4 @@
-from ..util import session
+from ..util import db
 from ..models import *
 import flask
 import flask.views
@@ -45,7 +45,7 @@ class Index(flask.views.MethodView):
         user = None
         user_name = flask.request.form['username'].strip()
         user_pass = flask.request.form['password']
-        for test_user in session.query(User).filter_by(username=user_name):
+        for test_user in User.query.filter_by(username=user_name).all():
             if test_user.password == hashlib.sha1(user_pass + test_user.salt).hexdigest():
                 user = test_user
                 break

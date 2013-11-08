@@ -1,5 +1,5 @@
 import re
-from ..util import session
+from ..util import db
 from ..models import *
 import flask
 import flask_login
@@ -9,7 +9,7 @@ import flask.views
 ## All Results
 class Results(flask.views.MethodView):
     def get(self):
-        results = session.query(Results).all()
+        results = WorkoutResult.query.all()
         pass
 
     def post(self):
@@ -20,7 +20,7 @@ class Results(flask.views.MethodView):
 class ResultCreate(flask.views.MethodView):
     def get(self, workout_id):
         if workout_id is not None:
-            workout = session.query(Workout).get(workout_id)
+            workout = Workout.query.get(workout_id)
             return flask.render_template('result_create.html', workout=workout)
         else:
             return flask.render_template('404.html'), 404
@@ -30,7 +30,7 @@ class ResultCreate(flask.views.MethodView):
 class ResultEdit(flask.views.MethodView):
     def get(self, result_id):
         if result_id is not None:
-            result = session.query(WorkoutResult).get(result_id)
+            result = WorkoutResult.query.get(result_id)
             return flask.render_template('result_edit.html', result=result)
         else:
             return flask.render_template('404.html'), 404
@@ -38,8 +38,8 @@ class ResultEdit(flask.views.MethodView):
 ## Result CRUD
 class ResultCRUD(flask.views.MethodView):
     def get(self, result_id):
-        if result_id is not None and session.query(WorkoutResult).get(result_id) is not None:
-            result = session.query(WorkoutResult).get(result_id)
+        if result_id is not None and WorkoutResult.query.get(result_id) is not None:
+            result = WorkoutResult.query.get(result_id)
             if result is not None:
                 return flask.render_template('result.html', user=flask_login.current_user, result=result)
         return flask.render_template('404.html'), 404
@@ -59,11 +59,11 @@ class ResultCRUD(flask.views.MethodView):
         if ResultCRUD.validate_result_create(workout_id) != 0:
             return flask.redirect(flask.url_for('result_create', workout_id=workout_id))
         else:
-            result = session.query(WorkoutResult).get(result_id)
+            result = WorkoutResult.query.get(result_id)
             for part in result.parts:
                 part.result = flask.request.form['result_'+part.order]
                 part.details = flask.request.form['detail_'+part.order]
-            session.commit()
+            db.session.commit()
             flask.flash("Successfully updated workout result!", "success")
             return flask.redirect(flask.url_for('result', result_id=result_id))
 
@@ -80,7 +80,7 @@ class ResultCRUD(flask.views.MethodView):
             result = WorkoutResult()
             result.user = flask_login.current_user
             result.workout_id = workout_id
-            for part in session.query(Workout).get(workout_id).parts:
+            for part in Workout.query.get(workout_id).parts:
                 result_data = flask.request.form['result_'+part.order]
                 result_details = flask.request.form['detail_'+part.order]
                 part_result = WorkoutPartResult(result_data)
@@ -88,8 +88,8 @@ class ResultCRUD(flask.views.MethodView):
                 part_result.part = part
                 part_result.details = result_details
                 result.parts.append(part_result)
-            session.add(result)
-            session.commit()
+            db.session.add(result)
+            db.session.commit()
             flask.flash("Successfully recorded workout!", "success")
             return flask.redirect(flask.url_for('result', result_id=result.id))
 
@@ -100,7 +100,7 @@ class ResultCRUD(flask.views.MethodView):
         if workout_id == "":
             flask.flash("Unable to create result for null workout!", "error")
             error += 1
-        workout = session.query(Workout).get(int(workout_id))
+        workout = Workout.query.get(int(workout_id))
         for part in workout.parts:
             if flask.request.form.get('result_'+part.order) == "":
                 flask.flash("All parts require results!", "error")

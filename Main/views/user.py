@@ -1,4 +1,4 @@
-from ..util import session
+from ..util import db
 from ..models import *
 import flask
 import flask_login
@@ -23,8 +23,8 @@ class Users(flask.views.MethodView):
             user_type = flask.request.form.get('user_type', '')
             if user_type == "owner":
                 user.is_gym_owner = True
-            session.add(user)
-            session.commit()
+            db.session.add(user)
+            db.session.commit()
             return flask.redirect(flask.url_for('index'))
 
     @staticmethod
@@ -47,12 +47,12 @@ class Users(flask.views.MethodView):
 
     @staticmethod
     def owners_of_gym(gym_id):
-        users = session.query(User).filter_by(owner_gym_id=gym_id)
+        users = User.query.filter_by(owner_gym_id=gym_id).all()
         return flask.render_template('gym_owners.html', users=users)
 
     @staticmethod
     def members_of_gym(gym_id):
-        users = session.query(User).filter_by(member_gym_id=id)
+        users = User.query.filter_by(member_gym_id=id).all()
         return flask.render_template('gym_members.html', users=users)
 
 
@@ -66,7 +66,7 @@ class UserCreate(flask.views.MethodView):
 class UserEdit(flask.views.MethodView):
     def get(self, user_id):
         if user_id is not None:
-            user = session.query(User).get(user_id)
+            user = User.query.get(user_id)
             return flask.render_template('user_edit.html', user=user)
         else:
             return flask.render_template('404.html'), 404
@@ -81,8 +81,8 @@ class UserDelete(flask.views.MethodView):
 ## User CRUD
 class UserCRUD(flask.views.MethodView):
     def get(self, user_id):
-        if user_id is not None and session.query(User).get(user_id) is not None:
-            user = session.query(User).get(user_id)
+        if user_id is not None and User.query.get(user_id) is not None:
+            user = User.query.get(user_id)
             if user is not None:
                 return flask.render_template('user.html', viewed_user=user, user=flask_login.current_user)
         return flask.render_template('404.html'), 404
@@ -101,10 +101,10 @@ class UserCRUD(flask.views.MethodView):
         if UserCRUD.validate_user_edit() != 0:
             return flask.redirect(flask.url_for('user_edit', user_id=user_id))
         else:
-            user = session.query(User).get(user_id)
+            user = User.query.get(user_id)
             user.username = flask.request.form['username']
-            session.add(user)
-            session.commit()
+            db.session.add(user)
+            db.session.commit()
             return flask.redirect(flask.url_for('user', user_id=user.id))
 
     @staticmethod

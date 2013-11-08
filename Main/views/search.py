@@ -1,5 +1,5 @@
 import datetime
-from ..util import session
+from ..util import db
 from ..models import *
 import flask
 import flask_login
@@ -58,7 +58,7 @@ class SearchView(flask.views.MethodView):
 
     @staticmethod
     def getUserResults(from_date, to_date, tags):
-        results = session.query(WorkoutResult).filter(WorkoutResult.user_id == flask_login.current_user.id).all()
+        results = WorkoutResult.query.filter(WorkoutResult.user_id == flask_login.current_user.id).all()
         final_results = []
         for result in results:
             if from_date <= result.workout.post_date <= to_date:
@@ -73,7 +73,7 @@ class SearchView(flask.views.MethodView):
 
     @staticmethod
     def getGymResults(from_date, to_date):
-        results = session.query(WorkoutResult).all()
+        results = WorkoutResult.query.all()
         final_results = []
         for result in results:
             if from_date <= result.workout.post_date <= to_date:
@@ -83,7 +83,7 @@ class SearchView(flask.views.MethodView):
 
     @staticmethod
     def getAllResults(from_date, to_date):
-        results = session.query(WorkoutResult).all()
+        results = WorkoutResult.query.all()
         final_results = []
         for result in results:
             if from_date <= result.workout.post_date <= to_date:

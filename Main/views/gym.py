@@ -1,4 +1,4 @@
-from ..util import session
+from ..util import db
 from ..models import *
 import flask
 import flask_login
@@ -8,7 +8,7 @@ import flask.views
 ## All Gyms
 class Gyms(flask.views.MethodView):
     def get(self):
-        gyms = session.query(Gym)
+        gyms = Gym.query.all()
         return flask.render_template('all_gyms.html', gyms=gyms, user=flask_login.current_user)
 
     def post(self):
@@ -20,8 +20,8 @@ class Gyms(flask.views.MethodView):
             flask.redirect(flask.url_for('gym_create'))
         gym = Gym(flask.request.form['gym_name'], flask.request.form['gym_description'])
         gym.owners.append(flask_login.current_user)
-        session.add(gym)
-        session.commit()
+        db.session.add(gym)
+        db.session.commit()
         return flask.redirect(flask.url_for('gym', gym_id=gym.id))
 
     @staticmethod
@@ -43,7 +43,7 @@ class GymCreate(flask.views.MethodView):
 class GymEdit(flask.views.MethodView):
     def get(self, gym_id):
         if gym_id is not None:
-            gym = session.query(Gym).get(gym_id)
+            gym = Gym.query.get(gym_id)
             return flask.render_template('gym_edit.html', gym=gym)
         else:
             return flask.render_template('404.html'), 404
@@ -58,8 +58,8 @@ class GymDelete(flask.views.MethodView):
 ## Gym CRUD
 class GymCRUD(flask.views.MethodView):
     def get(self, gym_id):
-        if gym_id is not None and session.query(Gym).get(gym_id) is not None:
-            gym = session.query(Gym).get(gym_id)
+        if gym_id is not None and Gym.query.get(gym_id) is not None:
+            gym = Gym.query.get(gym_id)
             user = flask_login.current_user
             results = {}
             for result in user.results:
@@ -86,11 +86,11 @@ class GymCRUD(flask.views.MethodView):
         if GymCRUD.validate_gym_data() != 0:
             return flask.redirect(flask.url_for('gym_edit', gym_id=gym_id))
         else:
-            gym = session.query(Gym).get(gym_id)
+            gym = Gym.query.get(gym_id)
             gym.name = flask.request.form['gym_name']
             gym.description = flask.request.form['gym_description']
-            session.add(gym)
-            session.commit()
+            db.session.add(gym)
+            db.session.commit()
             return flask.redirect(flask.url_for('gym', gym_id=gym_id))
 
     @staticmethod
@@ -101,11 +101,11 @@ class GymCRUD(flask.views.MethodView):
     def join_gym(gym_id):
         if gym_id is None:
             return flask.render_template('404.html'), 404
-        gym = session.query(Gym).get(gym_id)
+        gym = Gym.query.get(gym_id)
         if gym is None:
             return flask.render_template('404.html'), 404
         gym.members.append(flask_login.current_user)
-        session.commit()
+        db.session.commit()
         flask.flash("Successfully joined " + gym.name + "!", "success")
         return flask.redirect(flask.url_for('gym', gym_id=gym_id))
 
@@ -120,8 +120,8 @@ class GymCRUD(flask.views.MethodView):
 
 class AllGymMembersView(flask.views.MethodView):
     def get(self, gym_id):
-        if gym_id is not None and session.query(Gym).get(gym_id) is not None:
-            gym = session.query(Gym).get(gym_id)
+        if gym_id is not None and Gym.query.get(gym_id) is not None:
+            gym = Gym.query.get(gym_id)
             return flask.render_template('gym_members.html', gym=gym)
         else:
             return flask.render_template('404.html'), 404
@@ -129,8 +129,8 @@ class AllGymMembersView(flask.views.MethodView):
 
 class AllGymOwnersView(flask.views.MethodView):
     def get(self, gym_id):
-        if gym_id is not None and session.query(Gym).get(gym_id) is not None:
-            gym = session.query(Gym).get(gym_id)
+        if gym_id is not None and Gym.query.get(gym_id) is not None:
+            gym = Gym.query.get(gym_id)
             return flask.render_template('gym_owners.html', gym=gym)
         else:
             return flask.render_template('404.html'), 404
