@@ -39,6 +39,7 @@ nosetests.xml
 *.idea
 *.DS_STORE
 *.sqlite
+*.un~
 venv/
 Main/static/bootstrap-3.0.0/
 Main/static/img/

@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block body %}
+<form method="POST" action="/WeighIn">
+    {{ form.hidden_tag() }}
+    <dl>
+        {{ form.weight }}
+        {{ form.date }}
+        <input type="submit" value="Submit">
+    </dl>
+</form>
+{% endblock %}
