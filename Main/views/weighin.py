@@ -1,12 +1,12 @@
-from ..util import session
 from ..models import *
 from ..forms import *
+from ..util import db
 from flask.ext.login import current_user
 from flask import render_template, request, url_for
 import flask.views
 
+
 class WeighInView(flask.views.View):
-    methods = ['GET', 'POST']
 
     def dispatch_request(self):
         form = WeighInForm(request.form)
@@ -17,5 +17,5 @@ class WeighInView(flask.views.View):
             db.session.commit()
             return render_template('weigh_in.html', form=form, weighins=weighins)
 
-        return render_template('weigh_in.html', form=form, weighings=weighins)
+        return render_template('weigh_in.html', form=form, weighins=weighins)
 

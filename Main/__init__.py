@@ -12,6 +12,7 @@ from Main.views.workout import *
 from Main.views.result import *
 from Main.views.api import *
 from Main.views.search import *
+from Main.views.weighin import *
 
 ## ------------ INDEX -------------- ##
 app.add_url_rule('/',
@@ -51,6 +52,11 @@ app.add_url_rule('/gym/<int:gym_id>/members/',
 app.add_url_rule('/gym/<int:gym_id>/owners/',
                  view_func=AllGymOwnersView.as_view('gym_owners'),
                  methods=['GET'])
+
+## -------------- WEIGH IN ---------------- ##
+app.add_url_rule('/weighins/',
+                view_func=WeighInView.as_view('weigh_in'),
+                methods=['GET','POST'])
 
 ## -------------- WORKOUT ----------------- ##
 app.add_url_rule('/workouts/',
