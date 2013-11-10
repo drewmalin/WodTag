@@ -1,5 +1,6 @@
 from util import db, lm
 from sqlalchemy.orm import relationship
+from datetime import date
 import hashlib
 import random
 
@@ -62,6 +63,24 @@ class Gym(db.Model):
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
+###
+# Weigh In for a user. Currently simple and contains only weight and date of
+# weigh in. Could potentially contain %fat, blood pressue, and other body statistics
+#
+class WeighIn(db.Model):
+    __tablename__ = 'WeighIn'
+    id = db.Column(db.Integer, primary_key=True)
+    weight = db.Column(db.Float)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    date = db.Column(db.Date)
+
+    def __init__(self, weight, user_id, date=None):
+        self.weight = weight
+        self.user_id = user_id
+        if date is None:
+            date = date.now()
+        self.date = date
 
 ###
 # Acts as a template for workout results. Gyms create and own templated workouts,
