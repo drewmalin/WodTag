@@ -2,10 +2,12 @@
 {% block body %}
 {% if user %}
     <div class="container">
-        <form class="form-signin" action="{{ url_for('user', user_id=user.id) }}" method="POST">
+        <form class="form-signin" action="{{ url_for('user', user_id=user.id) }}" method="POST" enctype="multipart/form-data">
             <h2 class="form-signin-heading">Edit User</h2>
             <input type="hidden" name="_method" value="PUT">
             <input class="form-control" name="username" type="text" value="{{ user.username }}" autofocus/><br>
+            <input class="form-control" name="profile_pic" type=file>
+            <br />
             <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Save</button>
         </form>
     </div>

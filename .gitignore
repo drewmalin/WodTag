@@ -35,6 +35,12 @@ nosetests.xml
 .project
 .pydevproject
 
+# img
+*.png
+*.jpg
+*.jpeg
+*.gif
+
 # additional
 *.idea
 *.DS_STORE

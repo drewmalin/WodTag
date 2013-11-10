@@ -1,9 +1,13 @@
+import os
 from ..util import db
 from ..models import *
 import flask
 import flask_login
 import flask.views
+from werkzeug import secure_filename
 
+IMG_URL = 'Main/static/img/'
+IMG_FILETYPES = ['png', 'jpg', 'jpeg', 'gif']
 
 ## All Users
 class Users(flask.views.MethodView):
@@ -83,8 +87,12 @@ class UserCRUD(flask.views.MethodView):
     def get(self, user_id):
         if user_id is not None and User.query.get(user_id) is not None:
             user = User.query.get(user_id)
+            if os.path.isfile(IMG_URL+str(user.id)):
+                pic = 'img/'+str(user.id)
+            else:
+                pic = 'img/placeholder.png'
             if user is not None:
-                return flask.render_template('user.html', viewed_user=user, user=flask_login.current_user)
+                return flask.render_template('user.html', pic=pic, viewed_user=user, user=flask_login.current_user)
         return flask.render_template('404.html'), 404
 
     def post(self, user_id):
@@ -102,9 +110,15 @@ class UserCRUD(flask.views.MethodView):
             return flask.redirect(flask.url_for('user_edit', user_id=user_id))
         else:
             user = User.query.get(user_id)
+            pic = flask.request.files['profile_pic']
             user.username = flask.request.form['username']
             db.session.add(user)
             db.session.commit()
+
+            if pic:
+                pic.save(IMG_URL+str(user_id))
+                pic.close()
+
             return flask.redirect(flask.url_for('user', user_id=user.id))
 
     @staticmethod
@@ -117,4 +131,9 @@ class UserCRUD(flask.views.MethodView):
         if flask.request.form['username'] == "":
             flask.flash("Username is required!", "error")
             error += 1
+        if flask.request.files['profile_pic']:
+            filename = secure_filename(flask.request.files['profile_pic'].filename)
+            if not filename.rsplit('.', 1)[1] in IMG_FILETYPES:
+                flask.flash("User picture must be an image file!", "error")
+                error += 1
         return error

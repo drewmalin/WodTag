@@ -35,7 +35,7 @@
                             {% if user.member_of_gym %}
                                 <li><a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">Gym</a></li>
                             {% endif %}
-                            <li><a href="/search/">Search</a></li>
+                            <li><a href="{{ url_for('search') }}">Search</a></li>
                             <li role="presentation" class="divider"></li>
                             <li><a href="#" onclick="document.getElementById('logout').submit()">Sign Out</a></li>
                             <li>
