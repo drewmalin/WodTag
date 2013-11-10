@@ -55,8 +55,8 @@ app.add_url_rule('/gym/<int:gym_id>/owners/',
 
 ## -------------- WEIGH IN ---------------- ##
 app.add_url_rule('/weighins/',
-                view_func=WeighIns.as_view('weigh_in'),
-                methods=['GET','POST'])
+                 view_func=WeighIns.as_view('weigh_in'),
+                 methods=['GET', 'POST'])
 
 ## -------------- WORKOUT ----------------- ##
 app.add_url_rule('/workouts/',

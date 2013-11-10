@@ -1,6 +1,7 @@
 import datetime
 from ..util import db
 from ..models import *
+from sqlalchemy.sql import and_, or_
 import flask
 import flask_login
 import flask.views
@@ -25,21 +26,18 @@ class SearchView(flask.views.MethodView):
 
         from_date = datetime.datetime.strptime(from_date, '%Y-%m-%d')
         to_date = datetime.datetime.strptime(to_date, '%Y-%m-%d')
-        tags = SearchView.fixTags(original_tags)
+        tags = SearchView.fix_tags(original_tags)
 
         if from_date > to_date:
             flask.flash("From Date must come before To Date!", "error")
             results = None
         else:
             if original_radio == "user":
-                results = SearchView.getUserResults(from_date, to_date, tags)
+                results = SearchView.get_user_results(from_date, to_date, tags)
             elif original_radio == "gym":
-                results = SearchView.getGymResults(from_date, to_date)
+                results = SearchView.get_gym_results(from_date, to_date, tags)
             else:
-                results = SearchView.getAllResults(from_date, to_date)
-
-        print "*********************** searching from " + str(from_date) + " to " + str(to_date)
-        print "*********************** got: " + str(results)
+                results = SearchView.get_all_results(from_date, to_date, tags)
 
         return flask.render_template('search.html',
                                      results=results,
@@ -50,42 +48,41 @@ class SearchView(flask.views.MethodView):
                                      user=flask_login.current_user)
 
     @staticmethod
-    def fixTags(tags):
+    def fix_tags(tags):
         final_tags = ""
         for tag in tags[0].split(','):
             final_tags += str(tag.strip()) + ","
         return str(final_tags)[:-1]
 
     @staticmethod
-    def getUserResults(from_date, to_date, tags):
-        results = WorkoutResult.query.filter(WorkoutResult.user_id == flask_login.current_user.id).all()
-        final_results = []
-        for result in results:
-            if from_date <= result.workout.post_date <= to_date:
-                if not tags or tags == "":
-                    final_results.append(result)
-                else:
-                    for part in result.workout.parts:
-                        for tag in part.tags:
-                            if any(tag.name in test_tag for test_tag in tags.split(',')):
-                                final_results.append(result)
-        return final_results
+    def get_user_results(from_date, to_date, tags):
+        user_part_results = WorkoutPartResult.query.join(WorkoutResult) \
+                                             .filter(WorkoutResult.user_id == flask_login.current_user.id) \
+                                             .join(Workout).filter(and_(Workout.post_date >= from_date,
+                                                                       (Workout.post_date <= to_date)))
+        return SearchView.get_workout_results(user_part_results.all(), tags)
 
     @staticmethod
-    def getGymResults(from_date, to_date):
-        results = WorkoutResult.query.all()
-        final_results = []
-        for result in results:
-            if from_date <= result.workout.post_date <= to_date:
-                if result.workout.gym_id == flask_login.current_user.member_of_gym.id:
-                    final_results.append(result)
-        return final_results
+    def get_gym_results(from_date, to_date, tags):
+        gym_id = flask_login.current_user.member_of_gym.id
+        gym_part_results = WorkoutPartResult.query.join(WorkoutResult).join(Workout) \
+                                            .filter(Workout.gym_id == gym_id) \
+                                            .filter(and_(Workout.post_date >= from_date,
+                                                        (Workout.post_date <= to_date)))
+        return SearchView.get_workout_results(gym_part_results.all(), tags)
 
     @staticmethod
-    def getAllResults(from_date, to_date):
-        results = WorkoutResult.query.all()
-        final_results = []
-        for result in results:
-            if from_date <= result.workout.post_date <= to_date:
-                final_results.append(result)
+    def get_all_results(from_date, to_date, tags):
+        all_part_results = WorkoutPartResult.query.join(WorkoutResult).join(Workout) \
+                                                  .filter(and_(Workout.post_date >= from_date,
+                                                              (Workout.post_date <= to_date)))
+        return SearchView.get_workout_results(all_part_results.all(), tags)
+
+    @staticmethod
+    def get_workout_results(result_list, tags):
+        if not tags or tags == "":
+            final_results = set([part.workout_result for part in result_list])
+        else:
+            final_results = set([part.workout_result for part in result_list
+                                 if set([tag.name for tag in part.part.tags]) & set(tags.split(', '))])
         return final_results

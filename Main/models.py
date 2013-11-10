@@ -50,6 +50,7 @@ class User(db.Model):
 def load_user(user_id):
     return User.query.get(user_id)
 
+
 class Gym(db.Model):
     __tablename__ = 'Gym'
     id = db.Column(db.Integer, primary_key=True)
@@ -63,6 +64,7 @@ class Gym(db.Model):
     def __init__(self, name, description):
         self.name = name
         self.description = description
+
 
 ###
 # Weigh In for a user. Currently simple and contains only weight and date of
@@ -82,6 +84,7 @@ class WeighIn(db.Model):
             date = date.now()
         self.date = date
 
+
 ###
 # Acts as a template for workout results. Gyms create and own templated workouts,
 # which can be used to generate user-specific results. Workout templates are made
@@ -100,6 +103,7 @@ class Workout(db.Model):
     def __init__(self, name):
         self.name = name
 
+
 ###
 # Pieces of a workout. Workouts are generally made up of two or three parts
 #
@@ -115,6 +119,7 @@ class WorkoutPart(db.Model):
     def __init__(self, description):
         self.description = description
 
+
 ###
 # Workout results are owned by users
 #
@@ -126,6 +131,7 @@ class WorkoutResult(db.Model):
     workout_id = db.Column(db.Integer, db.ForeignKey('Workout.id'))
     user = relationship('User', backref='results')
     parts = relationship('WorkoutPartResult', backref='workout_result', order_by='WorkoutPartResult.order')
+
 
 ###
 # Workout part results are owned by WorkoutResults

@@ -6,8 +6,10 @@ Back Squat
 Bar Muscle-Up
 Bench Press
 Box Jump
+Burpee
 Clean & Jerk
 Cluster
+Chest to Bar
 Deadlift
 Double Unders
 Dumbell Snatch
@@ -21,11 +23,13 @@ Jacknife
 Jerk
 Jumping Squats
 Kettlebell Swings
+Knees to Elbows
 Muscle-Up
 Overhead Squat
 Power Clean
 Power Snatch
 Pull-Up
+Push-Up
 Push Jerk
 Push Press
 Rope Climb
