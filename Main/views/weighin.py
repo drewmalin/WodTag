@@ -6,7 +6,7 @@ from flask import render_template, request, url_for
 import flask.views
 
 
-class WeighInView(flask.views.View):
+class WeighIns(flask.views.View):
 
     def dispatch_request(self):
         form = WeighInForm(request.form)
