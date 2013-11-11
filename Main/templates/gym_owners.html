@@ -6,7 +6,7 @@
             <h1>Owners of: <a href="{{ url_for('gym', gym_id=gym.id) }}">{{ gym.name }}</a></h1>
             <ul>
                 {% for owner in gym.owners %}
-                    <li><a href="{{ url_for('user', user=owner.id) }}">{{ owner.username }}</a></li>
+                    <li><a href="{{ url_for('user', user_id=owner.id) }}">{{ owner.username }}</a></li>
                 {% endfor %}
             </ul>
         </div>

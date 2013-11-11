@@ -4,7 +4,7 @@
     {% if user %}
         <div class="page-header">
             <h3>
-                <img src="{{ url_for('static', filename=pic) }}" class="img-rounded" height="200" width="160">
+                <img src="{{ url_for('static', filename=pic) }}" class="img-rounded" height="200">
                 {{ viewed_user.username }}
                 {% if viewed_user.id == user.id %}
                     <span class="btn-group">
