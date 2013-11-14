@@ -103,6 +103,11 @@ app.add_url_rule('/search/',
                  view_func=SearchView.as_view('search'),
                  methods=['GET', 'POST'])
 
+##-------------- 404 ------------------##
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
 ## ------------ DB Init -------------- ##
 from util import db
 from models import *
