@@ -1,6 +1,7 @@
 import os
 from ..util import db
 from ..models import *
+from flask.ext.login import login_required
 import flask
 import flask_login
 import flask.views
@@ -9,10 +10,12 @@ from werkzeug import secure_filename
 IMG_URL = 'Main/static/img/'
 IMG_FILETYPES = ['png', 'jpg', 'jpeg', 'gif']
 
+
 ## All Users
 class Users(flask.views.MethodView):
+    @login_required
     def get(self):
-        users = session.query(User).all()
+        users = User.query.all()
         pass
 
     def post(self):
@@ -68,6 +71,7 @@ class UserCreate(flask.views.MethodView):
 
 ## User EDIT View
 class UserEdit(flask.views.MethodView):
+    @login_required
     def get(self, user_id):
         if user_id is not None:
             user = User.query.get(user_id)
@@ -84,6 +88,7 @@ class UserDelete(flask.views.MethodView):
 
 ## User CRUD
 class UserCRUD(flask.views.MethodView):
+    @login_required
     def get(self, user_id):
         if user_id is not None and User.query.get(user_id) is not None:
             user = User.query.get(user_id)
@@ -95,6 +100,7 @@ class UserCRUD(flask.views.MethodView):
                 return flask.render_template('user.html', pic=pic, viewed_user=user, user=flask_login.current_user)
         return flask.render_template('404.html'), 404
 
+    @login_required
     def post(self, user_id):
         method = flask.request.form.get('_method', '')
         if method == "PUT":

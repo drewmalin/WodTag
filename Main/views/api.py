@@ -1,12 +1,13 @@
 from Main.decorators import crossdomain
-from ..util import db
 from ..models import *
+from flask.ext.login import login_required
 import flask
 import flask.views
 
 
 class TagsAPI(flask.views.MethodView):
 
+    @login_required
     @crossdomain(origin='*')
     def get(self, tag_id):
         if tag_id is None:

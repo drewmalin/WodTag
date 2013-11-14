@@ -1,15 +1,18 @@
 import datetime
-from ..util import db
 from ..models import *
 from sqlalchemy.sql import and_, or_
+from flask.ext.login import login_required
 import flask
 import flask_login
 import flask.views
 
 
 class SearchView(flask.views.MethodView):
+    @login_required
     def get(self):
         return flask.render_template('search.html', user=flask_login.current_user)
+
+    @login_required
     def post(self):
         original_radio = flask.request.form.get('optionsRadios')
         original_from_date = flask.request.form.get('from_date')

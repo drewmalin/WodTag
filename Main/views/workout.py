@@ -1,6 +1,7 @@
 import datetime
 from ..util import db
 from ..models import *
+from flask.ext.login import login_required
 import flask
 import flask_login
 import flask.views
@@ -8,22 +9,26 @@ import flask.views
 
 ## All Workouts
 class Workouts(flask.views.MethodView):
+    @login_required
     def get(self):
-        workouts = session.query(Workout).all()
+        workouts = db.session.query(Workout).all()
         pass
 
+    @login_required
     def post(self):
         return WorkoutCRUD.create_workout()
 
 
 ## Workout CREATE View
 class WorkoutCreate(flask.views.MethodView):
+    @login_required
     def get(self):
         return flask.render_template('workout_create.html')
 
 
 ## Workout EDIT View
 class WorkoutEdit(flask.views.MethodView):
+    @login_required
     def get(selfself, workout_id):
         if workout_id is not None:
             workout = Workout.query.get(workout_id)
@@ -34,6 +39,7 @@ class WorkoutEdit(flask.views.MethodView):
 
 ## Workout CRUD
 class WorkoutCRUD(flask.views.MethodView):
+    @login_required
     def get(self, workout_id):
         if workout_id is not None and Workout.query.get(workout_id) is not None:
             workout = Workout.query.get(workout_id)
@@ -41,6 +47,7 @@ class WorkoutCRUD(flask.views.MethodView):
                 return flask.render_template('workout.html', workout=workout, user=flask_login.current_user)
         return flask.render_template('404.html'), 404
 
+    @login_required
     def post(self, workout_id):
         method = flask.request.form.get('_method', '')
         if method == "PUT":
@@ -111,6 +118,7 @@ class WorkoutCRUD(flask.views.MethodView):
 
 
 class WorkoutResults(flask.views.MethodView):
+    @login_required
     def get(self, workout_id):
         if workout_id is not None and Workout.query.get(workout_id) is not None:
             workout = Workout.query.get(workout_id)

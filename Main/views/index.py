@@ -1,5 +1,5 @@
-from ..util import db
 from ..models import *
+from flask.ext.login import login_required
 import flask
 import flask.views
 import flask_login

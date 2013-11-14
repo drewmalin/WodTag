@@ -1,6 +1,7 @@
 import re
 from ..util import db
 from ..models import *
+from flask.ext.login import login_required
 import flask
 import flask_login
 import flask.views
@@ -8,16 +9,19 @@ import flask.views
 
 ## All Results
 class Results(flask.views.MethodView):
+    @login_required
     def get(self):
         results = WorkoutResult.query.all()
         pass
 
+    @login_required
     def post(self):
         return ResultCRUD.create_result()
 
 
 ## Result CREATE View
 class ResultCreate(flask.views.MethodView):
+    @login_required
     def get(self, workout_id):
         if workout_id is not None:
             workout = Workout.query.get(workout_id)
@@ -28,6 +32,7 @@ class ResultCreate(flask.views.MethodView):
 
 ## Result EDIT View
 class ResultEdit(flask.views.MethodView):
+    @login_required
     def get(self, result_id):
         if result_id is not None:
             result = WorkoutResult.query.get(result_id)
@@ -35,8 +40,10 @@ class ResultEdit(flask.views.MethodView):
         else:
             return flask.render_template('404.html'), 404
 
+
 ## Result CRUD
 class ResultCRUD(flask.views.MethodView):
+    @login_required
     def get(self, result_id):
         if result_id is not None and WorkoutResult.query.get(result_id) is not None:
             result = WorkoutResult.query.get(result_id)
@@ -44,6 +51,7 @@ class ResultCRUD(flask.views.MethodView):
                 return flask.render_template('result.html', user=flask_login.current_user, result=result)
         return flask.render_template('404.html'), 404
 
+    @login_required
     def post(self, result_id):
         method = flask.request.form.get('_method', '')
         if method == "PUT":

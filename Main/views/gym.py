@@ -1,5 +1,6 @@
 from ..util import db
 from ..models import *
+from flask.ext.login import login_required
 import flask
 import flask_login
 import flask.views
@@ -7,10 +8,12 @@ import flask.views
 
 ## All Gyms
 class Gyms(flask.views.MethodView):
+    @login_required
     def get(self):
         gyms = Gym.query.all()
         return flask.render_template('all_gyms.html', gyms=gyms, user=flask_login.current_user)
 
+    @login_required
     def post(self):
         return Gyms.new_gym()
 
@@ -35,12 +38,14 @@ class Gyms(flask.views.MethodView):
 
 ## Gym CREATE View
 class GymCreate(flask.views.MethodView):
+    @login_required
     def get(self):
         return flask.render_template('gym_create.html')
 
 
 ## Gym EDIT View
 class GymEdit(flask.views.MethodView):
+    @login_required
     def get(self, gym_id):
         if gym_id is not None:
             gym = Gym.query.get(gym_id)
@@ -57,6 +62,7 @@ class GymDelete(flask.views.MethodView):
 
 ## Gym CRUD
 class GymCRUD(flask.views.MethodView):
+    @login_required
     def get(self, gym_id):
         if gym_id is not None and Gym.query.get(gym_id) is not None:
             gym = Gym.query.get(gym_id)
@@ -72,6 +78,7 @@ class GymCRUD(flask.views.MethodView):
         else:
             return flask.render_template('404.html'), 404
 
+    @login_required
     def post(self, gym_id):
         method = flask.request.form.get('_method', '')
         if method == "PUT":
@@ -119,6 +126,7 @@ class GymCRUD(flask.views.MethodView):
 
 
 class AllGymMembersView(flask.views.MethodView):
+    @login_required
     def get(self, gym_id):
         if gym_id is not None and Gym.query.get(gym_id) is not None:
             gym = Gym.query.get(gym_id)
@@ -128,6 +136,7 @@ class AllGymMembersView(flask.views.MethodView):
 
 
 class AllGymOwnersView(flask.views.MethodView):
+    @login_required
     def get(self, gym_id):
         if gym_id is not None and Gym.query.get(gym_id) is not None:
             gym = Gym.query.get(gym_id)
