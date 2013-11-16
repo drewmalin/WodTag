@@ -58,7 +58,7 @@
             {% if viewed_user.results %}
                 <hr>
                 <h3>Recent results:</h3>
-                {% for result in viewed_user.results %}
+                {% for result in results %}
                     <div class="well well-sm">
                         <h4 class="pull-left"><a href="{{ url_for('result', result_id=result.id) }}">{{ result.workout.name }}</a></h4>
                         <h5 class="pull-right">Posted for: <a href="{{ url_for('gym', gym_id=result.workout.gym.id) }}">{{ result.workout.gym.name }}</a></h5>

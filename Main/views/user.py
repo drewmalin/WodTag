@@ -97,7 +97,9 @@ class UserCRUD(flask.views.MethodView):
             else:
                 pic = 'img/placeholder.png'
             if user is not None:
-                return flask.render_template('user.html', pic=pic, viewed_user=user, user=flask_login.current_user)
+                recent_results = WorkoutResult.query.join(Workout).join(User).\
+                    filter(User.id == user.id).order_by(Workout.post_date.desc()).limit(10)
+                return flask.render_template('user.html', pic=pic, viewed_user=user, user=flask_login.current_user, results=recent_results)
         return flask.render_template('404.html'), 404
 
     @login_required
