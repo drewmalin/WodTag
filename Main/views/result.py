@@ -122,7 +122,7 @@ class ResultCRUD(flask.views.MethodView):
                     flask.flash("Pound result must be a number!", "error")
                     error += 1
             elif part.uom.lower() == "time":
-                regex = re.compile('\d{2}:\d{2}(:\d{2})?')
+                regex = re.compile('(\d{1,2}:)?\d{1,2}:\d{2}')
                 if regex.match(flask.request.form.get('result_' + part.order)) is None:
                     flask.flash("Time result must be in the following format: mm:ss or hh:mm:ss!", "error")
                     error += 1
