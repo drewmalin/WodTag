@@ -53,6 +53,9 @@
                     <div class="col-md-6">
                         <div class="well well-sm">
                             {{ part.result }}
+                            {% if part.pr %}
+                                <span class="glyphicon glyphicon-star-empty"></span>
+                            {% endif %}
                         </div>
                         {% if part.details %}
                             <div class="well well-sm">

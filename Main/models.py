@@ -142,6 +142,7 @@ class WorkoutPartResult(db.Model):
     result = db.Column(db.String(128))
     details = db.Column(db.String(512))
     order = db.Column(db.String(64))
+    pr = db.Column(db.Boolean)
 
     part_id = db.Column(db.Integer, db.ForeignKey('WorkoutPart.id'))
     part = relationship('WorkoutPart', backref='results')

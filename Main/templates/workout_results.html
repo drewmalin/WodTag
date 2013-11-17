@@ -40,7 +40,11 @@
                 <h4><a href="{{ url_for('result', result_id=result.id) }}">{{ result.user.username}}</a></h4>
                 <ul>
                     {% for part in result.parts %}
-                        <li>{{ part.result }}</li>
+                        <li>{{ part.result }}
+                            {% if part.pr %}
+                                <span class="glyphicon glyphicon-star-empty"></span>
+                            {% endif %}
+                        </li>
                     {% endfor %}
                 </ul>
             </div>

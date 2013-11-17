@@ -71,6 +71,10 @@ class ResultCRUD(flask.views.MethodView):
             for part in result.parts:
                 part.result = flask.request.form['result_'+part.order]
                 part.details = flask.request.form['detail_'+part.order]
+                if flask.request.form.get('pr_'+part.order, False):
+                    part.pr = True
+                else:
+                    part.pr = False
             db.session.commit()
             flask.flash("Successfully updated workout result!", "success")
             return flask.redirect(flask.url_for('result', result_id=result_id))
@@ -91,10 +95,16 @@ class ResultCRUD(flask.views.MethodView):
             for part in Workout.query.get(workout_id).parts:
                 result_data = flask.request.form['result_'+part.order]
                 result_details = flask.request.form['detail_'+part.order]
+                if flask.request.form.get('pr_'+part.order, False):
+                    pr = True
+                else:
+                    pr = False
                 part_result = WorkoutPartResult(result_data)
+                part_result.pr = flask.request.form['pr_'+part.order]
                 part_result.order = part.order
                 part_result.part = part
                 part_result.details = result_details
+                part_result.pr = pr
                 result.parts.append(part_result)
             db.session.add(result)
             db.session.commit()

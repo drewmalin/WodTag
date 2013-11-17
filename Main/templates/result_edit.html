@@ -40,9 +40,14 @@
                             <div class="col-md-6">
                                 <div class="form-group">
                                     <label for="result">Result <font color="red">*</font></label>
-                                    <input id="result" name="result_{{ part.part.order }}" type="text" class="form-control" value="{{ part.result }}" placeholder="{{ part.uom }}"/>
+                                    <div class="input-group" id="result">
+                                        <input name="result_{{ part.part.order }}" type="text" class="form-control" value="{{ part.result }}" placeholder="{{ part.uom }}"/>
+                                        <span class="input-group-addon">
+                                            PR <input name="pr_{{ part.part.order }}" type="checkbox" {% if part.pr %} checked {% endif %}/>
+                                        </span>
+                                    </div>
                                 </div>
-                                 <div class="form-group">
+                                <div class="form-group">
                                     <label for="details">Details</label>
                                     <textarea id="details" name="detail_{{ part.part.order }}" class="form-control form-workout-textarea" rows="3">{{ part.details }}</textarea>
                                 </div>
