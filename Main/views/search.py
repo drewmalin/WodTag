@@ -18,6 +18,7 @@ class SearchView(flask.views.MethodView):
         original_from_date = flask.request.form.get('from_date')
         original_to_date = flask.request.form.get('to_date')
         original_tags = flask.request.form.getlist('tags[]')
+        pr_only = flask.request.form.get('prCheckbox')
 
         from_date = original_from_date
         if from_date == "":
@@ -36,11 +37,11 @@ class SearchView(flask.views.MethodView):
             results = None
         else:
             if original_radio == "user":
-                results = SearchView.get_user_results(from_date, to_date, tags)
+                results = SearchView.get_user_results(from_date, to_date, tags, pr_only)
             elif original_radio == "gym":
-                results = SearchView.get_gym_results(from_date, to_date, tags)
+                results = SearchView.get_gym_results(from_date, to_date, tags, pr_only)
             else:
-                results = SearchView.get_all_results(from_date, to_date, tags)
+                results = SearchView.get_all_results(from_date, to_date, tags, pr_only)
 
         return flask.render_template('search.html',
                                      results=results,
@@ -48,6 +49,7 @@ class SearchView(flask.views.MethodView):
                                      radio=original_radio,
                                      from_date=original_from_date,
                                      to_date=original_to_date,
+                                     prCheckbox=pr_only,
                                      user=flask_login.current_user)
 
     @staticmethod
@@ -58,31 +60,33 @@ class SearchView(flask.views.MethodView):
         return str(final_tags)[:-1]
 
     @staticmethod
-    def get_user_results(from_date, to_date, tags):
+    def get_user_results(from_date, to_date, tags, pr_only):
         user_part_results = WorkoutPartResult.query.join(WorkoutResult) \
                                              .filter(WorkoutResult.user_id == flask_login.current_user.id) \
                                              .join(Workout).filter(and_(Workout.post_date >= from_date,
                                                                        (Workout.post_date <= to_date)))
-        return SearchView.get_workout_results(user_part_results.all(), tags)
+        return SearchView.get_workout_results(user_part_results.all(), tags, pr_only)
 
     @staticmethod
-    def get_gym_results(from_date, to_date, tags):
+    def get_gym_results(from_date, to_date, tags, pr_only):
         gym_id = flask_login.current_user.member_of_gym.id
         gym_part_results = WorkoutPartResult.query.join(WorkoutResult).join(Workout) \
                                             .filter(Workout.gym_id == gym_id) \
                                             .filter(and_(Workout.post_date >= from_date,
                                                         (Workout.post_date <= to_date)))
-        return SearchView.get_workout_results(gym_part_results.all(), tags)
+        return SearchView.get_workout_results(gym_part_results.all(), tags, pr_only)
 
     @staticmethod
-    def get_all_results(from_date, to_date, tags):
+    def get_all_results(from_date, to_date, tags, pr_only):
         all_part_results = WorkoutPartResult.query.join(WorkoutResult).join(Workout) \
                                                   .filter(and_(Workout.post_date >= from_date,
                                                               (Workout.post_date <= to_date)))
-        return SearchView.get_workout_results(all_part_results.all(), tags)
+        return SearchView.get_workout_results(all_part_results.all(), tags, pr_only)
 
     @staticmethod
-    def get_workout_results(result_list, tags):
+    def get_workout_results(result_list, tags, pr_only):
+        if pr_only:
+            result_list = [part for part in result_list if part.pr == 1]
         if not tags or tags == "":
             final_results = set([part.workout_result for part in result_list])
         else:

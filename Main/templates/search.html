@@ -67,6 +67,17 @@
                                 All Users
                             </label>
                         </div>
+                        <br />
+                        <div class="checkbox">
+                            <label>
+                                {% if prCheckbox %}
+                                    <input type="checkbox" name="prCheckbox" checked>
+                                {% else %}
+                                    <input type="checkbox" name="prCheckbox">
+                                {% endif %}
+                                Only Display Workouts with PRs
+                            </label>
+                        </div>
                     </div>
                     <div class="col-md-6">
                         <div class="form-group">
@@ -90,7 +101,12 @@
                     <h4><a href="{{ url_for('result', result_id=result.id) }}">{{ result.user.username}}</a></h4>
                     <ul>
                         {% for part in result.parts %}
-                            <li>{{ part.result }}</li>
+                            <li>
+                                {{ part.result }} <font class="text-muted">{{ part.part.uom }}</font>
+                                {% if part.pr %}
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                {% endif %}
+                            </li>
                         {% endfor %}
                     </ul>
                 </div>
