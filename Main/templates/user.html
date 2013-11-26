@@ -78,6 +78,11 @@
                         <br /><br />
                         <p class="text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</p>
                         <ul class="readOnlyTags">
+                        {% for part in result.workout.parts %}
+                            {% for tag in part.tags %}
+                                <li>{{ tag.name }}</li>
+                            {% endfor %}
+                        {% endfor %}
                         </ul>
                     </div>
                 {% endfor %}
