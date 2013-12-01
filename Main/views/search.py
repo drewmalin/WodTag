@@ -40,6 +40,8 @@ class SearchView(flask.views.MethodView):
                 results = SearchView.get_user_results(from_date, to_date, tags, pr_only)
             elif original_radio == "gym":
                 results = SearchView.get_gym_results(from_date, to_date, tags, pr_only)
+            elif original_radio == "followed":
+                results = SearchView.get_followed_results(from_date, to_date, tags, pr_only)
             else:
                 results = SearchView.get_all_results(from_date, to_date, tags, pr_only)
 
@@ -75,6 +77,15 @@ class SearchView(flask.views.MethodView):
                                             .filter(and_(Workout.post_date >= from_date,
                                                         (Workout.post_date <= to_date)))
         return SearchView.get_workout_results(gym_part_results.all(), tags, pr_only)
+
+    @staticmethod
+    def get_followed_results(from_date, to_date, tags, pr_only):
+        followed_part_results = WorkoutPartResult.query.join(WorkoutResult) \
+                                                 .join(Workout).filter(and_(Workout.post_date >= from_date,
+                                                                           (Workout.post_date <= to_date)))
+        followed_ids = [u.id for u in flask_login.current_user.follows]
+        followed_parts = [part for part in followed_part_results.all() if part.workout_result.user_id in followed_ids]
+        return SearchView.get_workout_results(followed_parts, tags, pr_only)
 
     @staticmethod
     def get_all_results(from_date, to_date, tags, pr_only):

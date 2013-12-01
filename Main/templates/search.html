@@ -59,6 +59,16 @@
                         </div>
                         <div class="radio">
                             <label>
+                                {% if radio == "followed" %}
+                                    <input type="radio" name="optionsRadios" value="followed" checked>
+                                {% else %}
+                                    <input type="radio" name="optionsRadios" value="followed">
+                                {% endif %}
+                                Followed Users
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
                                 {% if radio == "all" %}
                                     <input type="radio" name="optionsRadios" value="all" checked>
                                 {% else %}
