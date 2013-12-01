@@ -15,30 +15,37 @@
 {% if gym %}
     <div class="container">
         <div class="page-header">
-            <h1>{{ gym.name }}
-                <span class="btn-group">
-                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                        <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
-                    </button>
-                    <ul class="dropdown-menu">
-                        {% if user_is_owner %}
-                            <li><a href="{{ url_for('gym_edit', gym_id=gym.id) }}">Edit Gym</a></li>
-                            <li><a href="{{ url_for('workout_create') }}">Create Template Workout</a></li>
-                            <li role="presentation" class="divider"></li>
-                        {% endif %}
-                        {% if not user.is_gym_owner and not user.member_of_gym %}
-                            <li><a href="#" onclick="document.getElementById('join').submit()">Join Gym</a></li>
-                            <li>
-                                <form id="join" action="{{ url_for('gym', gym_id=gym.id) }}" method="post">
-                                </form>
-                            </li>
-                            <li role="presentation" class="divider"></li>
-                        {% endif %}
-                        <li><a href="{{ url_for('gym_members', gym_id=gym.id) }}">View Members</a></li>
-                        <li><a href="{{ url_for('gym_owners', gym_id=gym.id) }}">View Owners</a></li>
-                    </ul>
-                </span>
-            </h1>
+            <div class="row">
+                <div class="col-lg-6">
+                    <h1>{{ gym.name }}
+                        <span class="btn-group">
+                            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% if user_is_owner %}
+                                    <li><a href="{{ url_for('gym_edit', gym_id=gym.id) }}">Edit Gym</a></li>
+                                    <li><a href="{{ url_for('workout_create') }}">Create Template Workout</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                {% endif %}
+                                {% if not user.is_gym_owner and not user.member_of_gym %}
+                                    <li><a href="#" onclick="document.getElementById('join').submit()">Join Gym</a></li>
+                                    <li>
+                                        <form id="join" action="{{ url_for('gym', gym_id=gym.id) }}" method="post">
+                                        </form>
+                                    </li>
+                                    <li role="presentation" class="divider"></li>
+                                {% endif %}
+                                <li><a href="{{ url_for('gym_members', gym_id=gym.id) }}">View Members</a></li>
+                                <li><a href="{{ url_for('gym_owners', gym_id=gym.id) }}">View Owners</a></li>
+                            </ul>
+                        </span>
+                    </h1>
+                </div>
+                <div class="col-lg-6">
+                    <h4 class="pull-right">Members: <a href="{{ url_for('gym_members', gym_id=gym.id) }}">{{gym.members|length}}</a></h4>
+                </div>
+            </div>
         </div>
         <hr>
         <h2>Workouts:</h2>
@@ -63,7 +70,7 @@
                                     {% endif %}
                                     {% if user_is_member %}
                                         {% if workout.id in user_posted_results %}
-                                            <li><a href="{{ url_for('result', result_id=user_posted_results[workout.id]) }}">View Result</a></li>
+                                            <li><a href="{{ url_for('result', result_id=user_posted_results[workout.id]) }}">View My Result</a></li>
                                         {% else %}
                                             <li><a href="{{ url_for('result_create', workout_id=workout.id) }}">Post Result</a></li>
                                         {% endif %}

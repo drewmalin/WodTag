@@ -17,7 +17,13 @@
         <div class="page-header">
             <div class="row">
                 <div class="col-lg-2">
-                        <img src="{{ url_for('static', filename=pic) }}" class="img-rounded" width="100%">
+                    {% set imgpath = 'img/' ~ viewed_user.id %}
+                    <a href="{{ url_for('user', user_id=viewed_user.id) }}">
+                        <img class="img-rounded"
+                             src="{{ url_for('static', filename=imgpath) }}"
+                             width="100%"
+                             alt="Image not found" onError="this.src='{{url_for('static', filename='img/placeholder.png')}}';">
+                    </a>
                 </div>
                 <div class="col-lg-10">
                     <div class="col-lg-6">
@@ -47,7 +53,7 @@
                     </div>
                     <div class="col-lg-6">
                         {% if user.member_of_gym %}
-                        <h3 class="pull-right"><a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">{{ user.member_of_gym.name }}</a></h3>
+                            <h3 class="pull-right">Member of: <a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">{{ user.member_of_gym.name }}</a></h3>
                         {% endif %}
                     </div>
                 </div>
