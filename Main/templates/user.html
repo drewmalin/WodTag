@@ -3,30 +3,43 @@
 <div class="container">
     {% if user %}
         <div class="page-header">
-            <h3>
-                <img src="{{ url_for('static', filename=pic) }}" class="img-rounded" height="200">
-                {{ viewed_user.username }}
-                {% if viewed_user.id == user.id %}
-                    <span class="btn-group">
-                        <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                            <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a href="{{ url_for('user_edit', user_id=user.id) }}">Edit Profile</a></li>
-                            <li role="presentation" class="divider"></li>
-                            {% if user.member_of_gym %}
-                                <li><a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">View Gym</a></li>
-                            {% elif user.owns_gym %}
-                                <li><a href="{{ url_for('gym', gym_id=user.owns_gym.id) }}">View Gym</a></li>
-                            {% elif viewed_user.is_gym_owner %}
-                                <li><a href="{{ url_for('gym_create') }}">Create Gym</a></li>
-                            {% else %}
-                                 <li><a href="{{ url_for('gyms') }}">Find Gym</a></li>
+            <div class="row">
+                <div class="col-lg-2">
+                        <img src="{{ url_for('static', filename=pic) }}" class="img-rounded" width="100%">
+                </div>
+                <div class="col-lg-10">
+                    <div class="col-lg-6">
+                        <h3 class="pull-left">
+                            {{ viewed_user.username }}
+                            {% if viewed_user.id == user.id %}
+                                <span class="btn-group">
+                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                        <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="{{ url_for('user_edit', user_id=user.id) }}">Edit Profile</a></li>
+                                        <li role="presentation" class="divider"></li>
+                                        {% if user.member_of_gym %}
+                                            <li><a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">View Gym</a></li>
+                                        {% elif user.owns_gym %}
+                                            <li><a href="{{ url_for('gym', gym_id=user.owns_gym.id) }}">View Gym</a></li>
+                                        {% elif viewed_user.is_gym_owner %}
+                                            <li><a href="{{ url_for('gym_create') }}">Create Gym</a></li>
+                                        {% else %}
+                                             <li><a href="{{ url_for('gyms') }}">Find Gym</a></li>
+                                        {% endif %}
+                                    </ul>
+                                </span>
                             {% endif %}
-                        </ul>
-                    </span>
-                {% endif %}
-            </h3>
+                        </h3>
+                    </div>
+                    <div class="col-lg-6">
+                        {% if user.member_of_gym %}
+                        <h3 class="pull-right"><a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">{{ user.member_of_gym.name }}</a></h3>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
         </div>
         {% if viewed_user.is_gym_owner %}
             {% if viewed_user.owns_gym %}
@@ -64,6 +77,13 @@
                         <h5 class="pull-right">Posted for: <a href="{{ url_for('gym', gym_id=result.workout.gym.id) }}">{{ result.workout.gym.name }}</a></h5>
                         <br /><br />
                         <p class="text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</p>
+                        <ul class="readOnlyTags">
+                        {% for part in result.workout.parts %}
+                            {% for tag in part.tags %}
+                                <li>{{ tag.name }}</li>
+                            {% endfor %}
+                        {% endfor %}
+                        </ul>
                     </div>
                 {% endfor %}
             {% else %}

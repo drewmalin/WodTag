@@ -45,6 +45,7 @@ nosetests.xml
 *.idea
 *.DS_STORE
 *.sqlite
+*.swp
 *.un~
 venv/
 Main/static/bootstrap-3.0.0/
