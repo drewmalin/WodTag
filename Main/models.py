@@ -18,6 +18,12 @@ tag_result_association = db.Table('tag_result_association',
                                   db.Column('result_id', db.Integer, db.ForeignKey('WorkoutResult.id')),
                                   db.Column('tag_id', db.Integer, db.ForeignKey('Tag.id')))
 
+###
+# Joiner for User following (User >---< User)
+user_follows_association = db.Table('user_follows_association',
+                                    db.Column('following_user_id', db.Integer, db.ForeignKey('User.id'), primary_key=True),
+                                    db.Column('followed_user_id', db.Integer, db.ForeignKey('User.id'), primary_key=True))
+
 
 class User(db.Model):
     __tablename__ = 'User'
@@ -27,6 +33,10 @@ class User(db.Model):
     salt = db.Column(db.String(128))
     email = db.Column(db.String(128))
     is_gym_owner = db.Column(db.Boolean)
+    follows = relationship('User', secondary=user_follows_association,
+                           primaryjoin=id==user_follows_association.c.following_user_id,
+                           secondaryjoin=id==user_follows_association.c.followed_user_id,
+                           backref='followed_by')
     member_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
     owner_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
 

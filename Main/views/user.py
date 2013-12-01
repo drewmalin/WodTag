@@ -102,7 +102,9 @@ class UserCRUD(flask.views.MethodView):
             if user is not None:
                 recent_results = WorkoutResult.query.join(Workout).join(User).\
                     filter(User.id == user.id).order_by(Workout.post_date.desc()).limit(10)
-                return flask.render_template('user.html', viewed_user=user, user=flask_login.current_user, results=recent_results)
+                followed = user.id in [u.id for u in flask_login.current_user.follows]
+                return flask.render_template('user.html', viewed_user=user, user=flask_login.current_user,
+                                             results=recent_results, followed=followed)
         return flask.render_template('404.html'), 404
 
     @login_required
@@ -113,7 +115,7 @@ class UserCRUD(flask.views.MethodView):
         elif method == "DELETE":
             return UserCRUD.delete_user(user_id)
         else:
-            return flask.render_template('404.html'), 404
+            return UserCRUD.follow_user(user_id)
 
     @staticmethod
     def edit_user(user_id):
@@ -136,6 +138,27 @@ class UserCRUD(flask.views.MethodView):
     @staticmethod
     def delete_user(user_id):
         pass
+
+    @staticmethod
+    def follow_user(user_id):
+        if user_id is None:
+            return flask.render_template('404.html'), 404
+        user = User.query.get(user_id)
+        if user is None:
+            return flask.render_template('404.html'), 404
+        if flask_login.current_user.id == user.id:
+            flask.flash("You cannot follow yourself!", "error")
+            return flask.redirect(flask.url_for('user', user_id=user.id))
+        if flask.request.form['follow'] == '1':
+            flask_login.current_user.follows.append(user)
+            flask.flash("Now following " + user.username + "!", "success")
+            db.session.commit()
+            return flask.redirect(flask.url_for('user', user_id=user.id))
+        else:
+            flask_login.current_user.follows.remove(user)
+            flask.flash("No longer following " + user.username + "!", "success")
+            db.session.commit()
+            return flask.redirect(flask.url_for('user', user_id=user.id))
 
     @staticmethod
     def validate_user_edit():

@@ -29,12 +29,12 @@
                     <div class="col-lg-6">
                         <h3 class="pull-left">
                             {{ viewed_user.username }}
-                            {% if viewed_user.id == user.id %}
-                                <span class="btn-group">
-                                    <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
-                                        <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
-                                    </button>
-                                    <ul class="dropdown-menu">
+                            <span class="btn-group">
+                                <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% if viewed_user.id == user.id %}
                                         <li><a href="{{ url_for('user_edit', user_id=user.id) }}">Edit Profile</a></li>
                                         <li role="presentation" class="divider"></li>
                                         {% if user.member_of_gym %}
@@ -46,9 +46,23 @@
                                         {% else %}
                                              <li><a href="{{ url_for('gyms') }}">Find Gym</a></li>
                                         {% endif %}
-                                    </ul>
-                                </span>
-                            {% endif %}
+                                    {% elif followed %}
+                                        <li><a href="#" onclick="document.getElementById('un-follow').submit()">Stop Following User</a></li>
+                                        <li>
+                                            <form id="un-follow" action="{{ url_for('user', user_id=viewed_user.id) }}" method="post">
+                                                <input type="hidden" name="follow" value="0">
+                                            </form>
+                                        </li>
+                                    {% else %}
+                                        <li><a href="#" onclick="document.getElementById('follow').submit()">Follow User</a></li>
+                                        <li>
+                                            <form id="follow" action="{{ url_for('user', user_id=viewed_user.id) }}" method="post">
+                                                <input type="hidden" name="follow" value="1">
+                                            </form>
+                                        </li>
+                                    {% endif %}
+                                </ul>
+                            </span>
                         </h3>
                     </div>
                     <div class="col-lg-6">
