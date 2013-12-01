@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 {% block body %}
+<script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    $(document).ready(function() {
+        $(".readOnlyTags").css("border", "0px");
+        $(".readOnlyTags").css("display", "inline-block");
+        $(".readOnlyTags").css("margin-bottom", "0px");
+    });
+    $(function() {
+        $('.readOnlyTags').tagit({
+            readOnly: true
+        });
+    });
+</script>
 <div class="container">
     {% if user %}
         <div class="page-header">
