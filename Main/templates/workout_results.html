@@ -14,7 +14,7 @@
 </script>
 <div class="container">
     <div class="page-header">
-        <h3>All Results for <a href="{{ url_for('workout', workout_id=workout.id) }}">{{ workout.name }}</a></h3>
+        <h2>{{ workout.name }}</h2>
         <h5 class="pull-left text-muted">{{ workout.post_date.strftime("%b %d %Y") }}</h5>
         <h4 class="pull-right"><a href="{{ url_for('gym', gym_id=workout.gym.id) }}">{{ workout.gym.name }}</a></h4>
     </div>
@@ -34,19 +34,28 @@
         {% endfor %}
     </div>
     <hr>
-    <div class="col-6 col-sm-6 col-lg-4">
+    <div class="row multi-columns-row">
         {% for result in workout.results %}
-            <div class="well well-sm">
-                <h4><a href="{{ url_for('result', result_id=result.id) }}">{{ result.user.username}}</a></h4>
-                <ul>
-                    {% for part in result.parts %}
-                        <li>{{ part.result }} <font class="text-muted">{{ part.part.uom }}</font>
-                            {% if part.pr %}
-                                <span class="glyphicon glyphicon-star-empty"></span>
-                            {% endif %}
-                        </li>
-                    {% endfor %}
-                </ul>
+            <div class="col-sm-6 col-md-4 col-lg-4">
+                <div class="well well-sm">
+                    <h4><a href="{{ url_for('result', result_id=result.id) }}">{{ result.user.username}}</a></h4>
+                    {% set imgpath = 'img/' ~ result.user.id %}
+                    <a href="{{ url_for('user', user_id=result.user.id) }}">
+                        <img class="pull-right img-rounded"
+                             src="{{ url_for('static', filename=imgpath) }}"
+                             height="50"
+                             alt="Image not found" onError="this.src='{{url_for('static', filename='img/placeholder.png')}}';">
+                    </a>
+                    <ul>
+                        {% for part in result.parts %}
+                            <li>{{ part.result }} <font class="text-muted">{{ part.part.uom }}</font>
+                                {% if part.pr %}
+                                    <span class="glyphicon glyphicon-star-empty"></span>
+                                {% endif %}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         {% endfor %}
     </div>

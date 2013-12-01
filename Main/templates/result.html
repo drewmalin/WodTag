@@ -22,11 +22,13 @@
                 </button>
                 <ul class="dropdown-menu">
                     <li><a href="{{ url_for('result_edit', result_id=result.id) }}">Edit Result</a></li>
+                    <li role="presentation" class="divider"></li>
+                    <li><a href="{{ url_for('workout_results', workout_id=result.workout.id) }}">View Gym Results</a></li>
                 </ul>
             </span>
             {% endif %}
         </h1>
-        <h4 class="pull-left"><a href="{{ url_for('workout', workout_id=result.workout.id) }}">{{ result.workout.name }}</a></h4>
+        <h4 class="pull-left">{{ result.workout.name }}</h4>
         <h4 class="pull-right"><a href="{{ url_for('user', user_id=result.user.id) }}">{{ result.user.username }}</a></h4>
         <br /><br />
         <h5 class="pull-left text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</h5>
