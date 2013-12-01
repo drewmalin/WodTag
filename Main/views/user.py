@@ -1,4 +1,4 @@
-import os
+import re
 from ..util import db
 from ..models import *
 from flask.ext.login import login_required
@@ -27,6 +27,7 @@ class Users(flask.views.MethodView):
             return flask.redirect(flask.url_for('user_create'))
         else:
             user = User(flask.request.form['username'], flask.request.form['password'])
+            user.email = flask.request.form.get('email', '')
             user_type = flask.request.form.get('user_type', '')
             if user_type == "owner":
                 user.is_gym_owner = True
@@ -50,6 +51,12 @@ class Users(flask.views.MethodView):
         if not user_type:
             flask.flash("Define membership type!", "error")
             error += 1
+        email = flask.request.form.get('email', '')
+        if email:
+            regex = re.compile('[^@]+@[^@]+\.[^@]+')
+            if regex.match(email) is None:
+                flask.flash("Email is invalid!", "error")
+                error += 1
         return error
 
     @staticmethod
@@ -116,6 +123,7 @@ class UserCRUD(flask.views.MethodView):
             user = User.query.get(user_id)
             pic = flask.request.files['profile_pic']
             user.username = flask.request.form['username']
+            user.email = flask.request.form.get('email', '')
             db.session.add(user)
             db.session.commit()
 
@@ -139,5 +147,11 @@ class UserCRUD(flask.views.MethodView):
             filename = secure_filename(flask.request.files['profile_pic'].filename)
             if not filename.rsplit('.', 1)[1] in IMG_FILETYPES:
                 flask.flash("User picture must be an image file!", "error")
+                error += 1
+        email = flask.request.form.get('email', '')
+        if email:
+            regex = re.compile('[^@]+@[^@]+\.[^@]+')
+            if regex.match(email) is None:
+                flask.flash("Email is invalid!", "error")
                 error += 1
         return error

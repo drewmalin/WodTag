@@ -25,6 +25,7 @@ class User(db.Model):
     username = db.Column(db.String(128))
     password = db.Column(db.String(128))
     salt = db.Column(db.String(128))
+    email = db.Column(db.String(128))
     is_gym_owner = db.Column(db.Boolean)
     member_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
     owner_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))

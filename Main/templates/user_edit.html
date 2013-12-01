@@ -6,6 +6,7 @@
             <h2 class="form-signin-heading">Edit User</h2>
             <input type="hidden" name="_method" value="PUT">
             <input class="form-control" name="username" type="text" value="{{ user.username }}" autofocus/><br>
+            <input class="form-control" name="email" type="email" value="{{ user.email }}"/><br>
             <input class="form-control" name="profile_pic" type=file>
             <br />
             <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Save</button>

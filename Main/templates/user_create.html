@@ -4,6 +4,7 @@
     <form class="form-signin" action="{{ url_for('users') }}" method="POST">
         <h2 class="form-signin-heading">Sign up</h2>
         <input type="text" class="form-control" name="username" placeholder="Username" autofocus/><br>
+        <input type="email" class="form-control" name="email" placeholder="Email"/><br>
         <input type="password" class="form-control" name="password" placeholder="Password"/><br>
         <input type="password" class="form-control" name="password2" placeholder="Repeat password"/>
         <div class="radio">
