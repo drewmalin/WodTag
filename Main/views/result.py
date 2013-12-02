@@ -1,7 +1,8 @@
 import re
-from ..util import db
+from ..util import db, mail
 from ..models import *
 from flask.ext.login import login_required
+from flask.ext.mail import Message
 import flask
 import flask_login
 import flask.views
@@ -100,7 +101,6 @@ class ResultCRUD(flask.views.MethodView):
                 else:
                     pr = False
                 part_result = WorkoutPartResult(result_data)
-                part_result.pr = flask.request.form['pr_'+part.order]
                 part_result.order = part.order
                 part_result.part = part
                 part_result.details = result_details
@@ -109,6 +109,14 @@ class ResultCRUD(flask.views.MethodView):
             db.session.add(result)
             db.session.commit()
             flask.flash("Successfully recorded workout!", "success")
+            """
+            msg = Message("Hello",
+                  sender="from@example.com",
+                  recipients=["drewmalin@gmail.com"])
+            msg.body = "testing"
+            msg.html = "<b>testing</b>"
+            mail.send(msg)
+            """
             return flask.redirect(flask.url_for('result', result_id=result.id))
 
 
