@@ -54,9 +54,26 @@ app.add_url_rule('/gym/<int:gym_id>/owners/',
                  methods=['GET'])
 
 ## -------------- WEIGH IN ---------------- ##
+#app.add_url_rule('/weighins/',
+#                 view_func=WeighIns.as_view('weigh_in'),
+#                 methods=['GET', 'POST'])
+
 app.add_url_rule('/weighins/',
-                 view_func=WeighIns.as_view('weigh_in'),
+                 view_func=WeighIns.as_view('weighins'),
                  methods=['GET', 'POST'])
+app.add_url_rule('/weighin/',
+                 defaults={'weighin_id': None},
+                 view_func=WeighInCRUD.as_view('weighin_view'),
+                 methods=['GET'])
+app.add_url_rule('/weighin/<int:weighin_id>',
+                 view_func=WeighInCRUD.as_view('weighin_modify'),
+                 methods=['POST'])
+app.add_url_rule('/weighin/create/',
+                 view_func=WeighInCreate.as_view('weighin_create'),
+                 methods=['GET'])
+app.add_url_rule('/weighin/edit/<int:weighin_id>',
+                 view_func=WeighInEdit.as_view('weighin_edit'),
+                 methods=['GET'])
 
 ## -------------- WORKOUT ----------------- ##
 app.add_url_rule('/workouts/',

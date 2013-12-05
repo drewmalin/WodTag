@@ -101,8 +101,13 @@
                 {% endif %}
             {% endif %}
             {% if viewed_user.results %}
-                <hr>
-                <h3>Recent results:</h3>
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#">Results</a></li>
+                    {% if viewed_user.id == user.id %}
+                        <li><a href="{{ url_for('weighin_view') }}">Weigh-in</a></li>
+                    {% endif %}
+                </ul>
+                <br/>
                 {% for result in results %}
                     <div class="well well-sm">
                         <h4 class="pull-left"><a href="{{ url_for('result', result_id=result.id) }}">{{ result.workout.name }}</a></h4>

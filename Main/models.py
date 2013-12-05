@@ -39,6 +39,7 @@ class User(db.Model):
                            backref='followed_by')
     member_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
     owner_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
+    weighins = relationship('WeighIn', backref="user", order_by='WeighIn.date.desc()')
 
     def __init__(self, username, password):
         self.username = username
@@ -85,15 +86,13 @@ class WeighIn(db.Model):
     __tablename__ = 'WeighIn'
     id = db.Column(db.Integer, primary_key=True)
     weight = db.Column(db.Float)
+    body_fat = db.Column(db.Float)
+    muscle_mass = db.Column(db.Float)
     user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
     date = db.Column(db.Date)
 
-    def __init__(self, weight, user_id, date=None):
+    def __init__(self, weight):
         self.weight = weight
-        self.user_id = user_id
-        if date is None:
-            date = date.now()
-        self.date = date
 
 
 ###

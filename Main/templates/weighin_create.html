@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>Create Weigh-in</h1>
+    </div>
+    <form class="form" action="{{ url_for('weighins') }}" method="POST">
+        <div class="form-group">
+            <label for="weighin-date">Date <font color="red">*</font></label>
+            <input id="weighin-date" class="form-control" name="date" type="date"/><br>
+        </div>
+        <div class="form-group">
+            <label for="weight">Weight <font color="red">*</font></label>
+            <input class="form-control" name="weight" id="weight" autofocus/><br>
+        </div>
+        <div class="form-group">
+            <label for="bodyfat">Body Fat %</label>
+            <input class="form-control" name="bodyfat" id="bodyfat"/><br>
+        </div>
+        <div class="form-group">
+            <label for="musclemass">Muscle Mass %</label>
+            <input class="form-control" name="musclemass" id="musclemass"/><br>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}
