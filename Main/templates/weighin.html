@@ -1,7 +1,65 @@
 {% extends "base.html" %}
 {% block body %}
+<script src="http://code.highcharts.com/highcharts.js"></script>
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
 <script type="text/javascript" xmlns="http://www.w3.org/1999/html">
+    function render_chart(data) {
+        chart = new Highcharts.Chart({
+            chart: {
+                renderTo: 'chart_container',
+                defaultSeriesType: 'line'
+            },
+            title: {
+                text: 'Weigh In'
+            },
+            yAxis: [{
+                title: {
+                    text: 'Pounds',
+                    style: {
+                        color: '#4572A7'
+                    }
+                },
+                labels: {
+                    style: {
+                        color: '#4572A7'
+                    }
+                }
+            },
+            {
+                title: {
+                    text: 'Percentage',
+                    style: {
+                        color: '#89A54E'
+                    }
+                },
+                labels: {
+                    formatter: function() {
+                        return this.value +'%';
+                    },
+                    style: {
+                        color: '#89A54E'
+                    }
+                },
+                opposite: true
+            }],
+            xAxis: {
+                categories: data.dates
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'top',
+                x: -10,
+                y: 100,
+                borderWidth: 0
+            },
+            series: data.data
+        });
+    }
     $(document).ready(function() {
+        $.getJSON('{{ url_for('weighins_api') }}', function(data) {
+            render_chart(data);
+        });
         $(".readOnlyTags").css("border", "0px");
         $(".readOnlyTags").css("display", "inline-block");
         $(".readOnlyTags").css("margin-bottom", "0px");
@@ -21,7 +79,7 @@
                     <a href="{{ url_for('user', user_id=user.id) }}">
                         <img class="img-rounded"
                              src="{{ url_for('static', filename=imgpath) }}"
-                             width="100%"
+                             width="150px"
                              alt="Image not found" onError="this.src='{{url_for('static', filename='img/placeholder.png')}}';">
                     </a>
                 </div>
@@ -64,6 +122,7 @@
         <br />
         <a class="btn btn-primary" href="{{ url_for('weighin_create') }}">Post Weigh-in</a>
         <br /><br />
+        <div id="chart_container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
         {% if user.weighins %}
             <table class="table">
                 <tr>

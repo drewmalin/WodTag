@@ -114,6 +114,9 @@ app.add_url_rule('/api/tags/',
 app.add_url_rule('/api/tags/<int:tag_id>',
                  view_func=TagsAPI.as_view('known_tags_api'),
                  methods=['GET'])
+app.add_url_rule('/api/weighins/',
+                 view_func=WeighInAPI.as_view('weighins_api'),
+                 methods=['GET'])
 
 ## ------------- SEARCH ---------------##
 app.add_url_rule('/search/',
