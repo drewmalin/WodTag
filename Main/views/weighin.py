@@ -76,8 +76,14 @@ class WeighInCRUD(flask.views.MethodView):
             weighin = WeighIn.query.get(weighin_id)
             weighin.weight = flask.request.form['weight']
             weighin.date = datetime.datetime.strptime(flask.request.form['date'], '%Y-%m-%d').date()
-            weighin.body_fat = flask.request.form.get('bodyfat')
-            weighin.muscle_mass = flask.request.form.get('musclemass')
+            bf = flask.request.form.get('bodyfat')
+            if bf == '':
+                bf = 0
+            weighin.body_fat = float(bf)
+            mm = flask.request.form.get('musclemass')
+            if mm == '':
+                mm = 0
+            weighin.muscle_mass = float(mm)
             db.session.commit()
             flask.flash("Successfully updated weigh-in!", "success")
             return flask.redirect(flask.url_for('weighin_view'))
@@ -93,8 +99,14 @@ class WeighInCRUD(flask.views.MethodView):
         else:
             weighin = WeighIn(flask.request.form['weight'])
             weighin.date = datetime.datetime.strptime(flask.request.form['date'], '%Y-%m-%d').date()
-            weighin.body_fat = flask.request.form.get('bodyfat')
-            weighin.muscle_mass = flask.request.form.get('musclemass')
+            bf = flask.request.form.get('bodyfat')
+            if bf == '':
+                bf = 0
+            weighin.body_fat = float(bf)
+            mm = flask.request.form.get('musclemass')
+            if mm == '':
+                mm = 0
+            weighin.muscle_mass = float(mm)
             weighin.user = flask_login.current_user
             db.session.add(weighin)
             db.session.commit()

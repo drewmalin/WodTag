@@ -31,7 +31,6 @@ class WeighInAPI(flask.views.MethodView):
     @login_required
     @crossdomain(origin='*')
     def get(self):
-        final_json = ''
         final_json = '{'
         weighins = WeighIn.query.filter_by(user_id=flask_login.current_user.id).order_by(WeighIn.date.asc())
         final_json += "\"dates\":["

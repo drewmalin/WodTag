@@ -178,3 +178,13 @@ class UserCRUD(flask.views.MethodView):
                 flask.flash("Email is invalid!", "error")
                 error += 1
         return error
+
+
+class UserFollows(flask.views.MethodView):
+    @login_required
+    def get(self, user_id):
+        if user_id is not None:
+            user = User.query.get(user_id)
+            return flask.render_template('user_follows.html', user=user)
+        else:
+            return flask.render_template('404.html'), 404

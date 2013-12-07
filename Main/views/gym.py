@@ -23,6 +23,7 @@ class Gyms(flask.views.MethodView):
             flask.redirect(flask.url_for('gym_create'))
         gym = Gym(flask.request.form['gym_name'], flask.request.form['gym_description'])
         gym.owners.append(flask_login.current_user)
+        gym.members.append(flask_login.current_user)
         db.session.add(gym)
         db.session.commit()
         return flask.redirect(flask.url_for('gym', gym_id=gym.id))

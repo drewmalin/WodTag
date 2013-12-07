@@ -108,15 +108,27 @@
                         </h3>
                     </div>
                     <div class="col-lg-6">
-                        {% if user.member_of_gym %}
+                        {% if user.is_gym_owner and user.owns_gym  %}
+                            <h3 class="pull-right">Owner of: <a href="{{ url_for('gym', gym_id=user.owns_gym.id) }}">{{ user.owns_gym.name }}</a></h3>
+                        {% elif user.member_of_gym %}
                             <h3 class="pull-right">Member of: <a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">{{ user.member_of_gym.name }}</a></h3>
+                        {% endif %}
+                        <br /><br /><br />
+                        {% if user.follows %}
+                            <h3 class="pull-right">Followed Users: <a href="{{ url_for('user_follows', user_id=user.id) }}">{{user.follows|length}}</a></h3>
+                        {% else %}
+                            <h3 class="pull-right">Followed Users: 0</h3>
                         {% endif %}
                     </div>
                 </div>
             </div>
-        </div>
-        <ul class="nav nav-tabs">
-            <li><a href="{{ url_for('index') }}">Results</a></li>
+        </div> <!-- End header -->
+        <!-- Nav tabs -->
+        <ul id="tabs" class="nav nav-tabs">
+            {% if user.owns_gym %}
+                <li><a href="{{ url_for('index') }}#gym_results">Gym Results</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('index') }}#personal_results">Personal Results</a></li>
             <li class="active"><a href="#">Weigh-in</a></li>
         </ul>
         <br />

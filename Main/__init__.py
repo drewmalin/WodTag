@@ -32,6 +32,9 @@ app.add_url_rule('/user/create',
 app.add_url_rule('/user/edit/<int:user_id>',
                  view_func=UserEdit.as_view('user_edit'),
                  methods=['GET'])
+app.add_url_rule('/user/<int:user_id>/follows',
+                 view_func=UserFollows.as_view('user_follows'),
+                 methods=['GET'])
 
 ## ------------ GYM -------------- ##
 app.add_url_rule('/gyms/',

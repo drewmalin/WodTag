@@ -6,6 +6,11 @@
         $(".readOnlyTags").css("display", "inline-block");
         $(".readOnlyTags").css("margin-bottom", "0px");
     });
+    $(function () {
+        var activeTab = $('[href=' + location.hash + ']');
+        activeTab && activeTab.tab('show');
+        window.location = "#top";
+    });
     $(function() {
         $('.readOnlyTags').tagit({
             readOnly: true
@@ -66,67 +71,93 @@
                         </h3>
                     </div>
                     <div class="col-lg-6">
-                        {% if user.member_of_gym %}
-                            <h3 class="pull-right">Member of: <a href="{{ url_for('gym', gym_id=user.member_of_gym.id) }}">{{ user.member_of_gym.name }}</a></h3>
+                        {% if viewed_user.is_gym_owner and viewed_user.owns_gym %}
+                            <h3 class="pull-right">Owner of: <a href="{{ url_for('gym', gym_id=viewed_user.owns_gym.id) }}">{{ viewed_user.owns_gym.name }}</a></h3>
+                        {% elif viewed_user.member_of_gym %}
+                            <h3 class="pull-right">Member of: <a href="{{ url_for('gym', gym_id=viewed_user.member_of_gym.id) }}">{{ viewed_user.member_of_gym.name }}</a></h3>
+                        {% endif %}
+                        <br /><br /><br />
+                        {% if viewed_user.follows %}
+                            <h3 class="pull-right">Followed Users: <a href="{{ url_for('user_follows', user_id=viewed_user.id) }}">{{viewed_user.follows|length}}</a></h3>
+                        {% else %}
+                            <h3 class="pull-right">Followed Users: 0</h3>
                         {% endif %}
                     </div>
                 </div>
             </div>
-        </div>
-        {% if viewed_user.is_gym_owner %}
+        </div> <!-- End Header -->
+        <!-- Nav tabs -->
+        <ul id="tabs" class="nav nav-tabs">
             {% if viewed_user.owns_gym %}
-                <h3>Owner of: <a href="{{ url_for('gym', gym_id=viewed_user.owns_gym.id) }}">{{ viewed_user.owns_gym.name }}</a></h3>
-                <hr>
-                <h3>Recent recorded results:</h3>
-                {% for member in viewed_user.owns_gym.members %}
-                    {% for result in member.results %}
+                <li class="active"><a href="#gym_results" data-toggle="tab">Gym Results</a></li>
+                <li><a href="#personal_results" data-toggle="tab">Personal Results</a></li>
+            {% else %}
+                <li class="active"><a href="#personal_results" data-toggle="tab">Personal Results</a></li>
+            {% endif %}
+            {% if viewed_user.id == user.id %}
+                <li><a href="{{ url_for('weighin_view') }}">Weigh-in</a></li>
+            {% endif %}
+        </ul>
+        <!-- Tab panes -->
+        <div class="tab-content">
+            <div class="tab-pane active" id="gym_results">
+                <br/>
+                {% for workout in viewed_user.owns_gym.template_workouts %}
+                    {% if workout.results %}
+                        <h4>{{ workout.name }}<hr></h4>
+                        <div class="row multi-columns-row">
+                            {% for result in workout.results %}
+                                <div class="col-sm-6 col-md-4 col-lg-4">
+                                    <div class="well well-sm">
+                                        {% set imgpath = 'img/' ~ result.user.id %}
+                                        <a href="{{ url_for('user', user_id=result.user.id) }}">
+                                            <img class="pull-right img-rounded"
+                                                 src="{{ url_for('static', filename=imgpath) }}"
+                                                 height="50"
+                                                 alt="Image not found" onError="this.src='{{url_for('static', filename='img/placeholder.png')}}';">
+                                        </a>
+                                        <h4><a href="{{ url_for('result', result_id=result.id) }}">{{ result.user.username}}</a></h4>
+                                        <ul>
+                                            {% for part in result.parts %}
+                                                <li>{{ part.result }} <font class="text-muted">{{ part.part.uom }}</font>
+                                                    {% if part.pr %}
+                                                        <span class="glyphicon glyphicon-star-empty"></span>
+                                                    {% endif %}
+                                                </li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% if not viewed_user.owns_gym %} <!-- dumb, but apparently required for non-owner pages to work -->
+            <div class="tab-pane active" id="personal_results">
+            {% else %}
+            <div class="tab-pane" id="personal_results">
+            {% endif %}
+                <br/>
+                {% if viewed_user.results %}
+                    {% for result in results %}
                         <div class="well well-sm">
                             <h4 class="pull-left"><a href="{{ url_for('result', result_id=result.id) }}">{{ result.workout.name }}</a></h4>
-                            <h5 class="pull-right">Posted by: <a href="{{ url_for('user', user_id=member.id) }}">{{ member.username }}</a></h5>
+                            <h5 class="pull-right">Posted for: <a href="{{ url_for('gym', gym_id=result.workout.gym.id) }}">{{ result.workout.gym.name }}</a></h5>
                             <br /><br />
                             <p class="text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</p>
+                            <ul class="readOnlyTags">
+                            {% for part in result.workout.parts %}
+                                {% for tag in part.tags %}
+                                    <li>{{ tag.name }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            </ul>
                         </div>
                     {% endfor %}
-                {% endfor %}
-            {% else %}
-                {% if viewed_user.id == user.id %}
-                    <h3>No owned gyms found!</h3>
                 {% endif %}
-            {% endif %}
-        {% else %}
-            {% if viewed_user.member_of_gym %}
-            {% else %}
-                {% if viewed_user.id == user.id %}
-                    <h3>No gyms found!</h3>
-                {% endif %}
-            {% endif %}
-            {% if viewed_user.results %}
-                <ul class="nav nav-tabs">
-                    <li class="active"><a href="#">Results</a></li>
-                    {% if viewed_user.id == user.id %}
-                        <li><a href="{{ url_for('weighin_view') }}">Weigh-in</a></li>
-                    {% endif %}
-                </ul>
-                <br/>
-                {% for result in results %}
-                    <div class="well well-sm">
-                        <h4 class="pull-left"><a href="{{ url_for('result', result_id=result.id) }}">{{ result.workout.name }}</a></h4>
-                        <h5 class="pull-right">Posted for: <a href="{{ url_for('gym', gym_id=result.workout.gym.id) }}">{{ result.workout.gym.name }}</a></h5>
-                        <br /><br />
-                        <p class="text-muted">{{ result.workout.post_date.strftime("%b %d %Y") }}</p>
-                        <ul class="readOnlyTags">
-                        {% for part in result.workout.parts %}
-                            {% for tag in part.tags %}
-                                <li>{{ tag.name }}</li>
-                            {% endfor %}
-                        {% endfor %}
-                        </ul>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <h3>No results found!</h3>
-            {% endif %}
-        {% endif %}
+            </div>
+        </div>
     {% else %}
         <h3>:(</h3>
     {% endif %}

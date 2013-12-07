@@ -68,7 +68,7 @@
                                         <li><a href="#">Edit Workout</a></li>
                                         <li role="presentation" class="divider"></li>
                                     {% endif %}
-                                    {% if user_is_member %}
+                                    {% if user_is_member or user_is_owner %}
                                         {% if workout.id in user_posted_results %}
                                             <li><a href="{{ url_for('result', result_id=user_posted_results[workout.id]) }}">View My Result</a></li>
                                         {% else %}
