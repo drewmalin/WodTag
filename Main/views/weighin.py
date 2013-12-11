@@ -39,7 +39,8 @@ class WeighIns(flask.views.MethodView):
 class WeighInCreate(flask.views.MethodView):
     @login_required
     def get(self):
-        return flask.render_template('weighin_create.html')
+        today = datetime.date.today().strftime("%Y-%m-%d")
+        return flask.render_template('weighin_create.html', today=today)
 
 
 ## WeighIn EDIT View
