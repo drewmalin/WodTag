@@ -5,6 +5,7 @@ import flask
 import flask_login
 import flask.views
 
+WORKOUTS_PER_PAGE = 30
 
 ## All Gyms
 class Gyms(flask.views.MethodView):
@@ -69,13 +70,20 @@ class GymCRUD(flask.views.MethodView):
             gym = Gym.query.get(gym_id)
             user = flask_login.current_user
             results = {}
+            page = flask.request.args.get('page')
+            if page is None or int(page) <= 0:
+                page = 1
+            elif int(page) > int(len(gym.template_workouts) / WORKOUTS_PER_PAGE) + 1:
+                page = int(len(gym.template_workouts) / WORKOUTS_PER_PAGE) + 1
+            workouts = Workout.query.filter(Workout.gym_id==gym_id).order_by(Workout.post_date.desc()).\
+                paginate(int(page), WORKOUTS_PER_PAGE, False)
             for result in user.results:
                 results[result.workout.id] = result.id
             return flask.render_template('gym.html',
                                          gym=gym, user=user,
                                          user_is_owner=user.owns_gym is not None and user.owns_gym.id == gym.id,
                                          user_is_member=user.member_of_gym is not None and user.member_of_gym.id == gym.id,
-                                         user_posted_results=results)
+                                         user_posted_results=results, workouts=workouts)
         else:
             return flask.render_template('404.html'), 404
 

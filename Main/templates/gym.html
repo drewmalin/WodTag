@@ -49,8 +49,27 @@
         </div>
         <hr>
         <h2>Workouts:</h2>
+        <ul class="pagination">
+            {% if workouts.page == 1 %}
+                <li class="disabled"><a href="#">&laquo;</a></li>
+            {% else %}
+                <li><a href="{{ url_for('gym', gym_id=user.member_of_gym.id, page=workouts.prev_num) }}">&laquo;</a></li>
+            {% endif %}
+            {% for i in range(workouts.pages) %}
+                {% if i + 1 == workouts.page %}
+                    <li class="active"><a href="#">{{i+1}}</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('gym', gym_id=user.member_of_gym.id, page=i+1) }}">{{i+1}}</a></li>
+                {% endif %}
+            {% endfor %}
+            {% if workouts.page == workouts.pages %}
+                <li class="disabled"><a href="#">&raquo;</a></li>
+            {% else %}
+                <li><a href="{{ url_for('gym', gym_id=user.member_of_gym.id, page=workouts.next_num) }}">&raquo;</a></li>
+            {% endif %}
+        </ul>
         <div class="row multi-columns-row">
-            {% for workout in gym.template_workouts %}
+            {% for workout in workouts.items %}
                 <div class="col-sm-6 col-md-4 col-lg-3">
                     <div class="well well-sm"
                          {% if workout.id in user_posted_results %}
