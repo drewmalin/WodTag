@@ -114,6 +114,10 @@ class ResultCRUD(flask.views.MethodView):
             msg = Message(flask_login.current_user.username + " just recorded a new workout result!",
                   sender=("WodTag", "admin@wodtag.com"))
 
+            for follower in flask_login.current_user.followed_by:
+                if follower.email is not None or follower.email != "":
+                    msg.add_recipient(follower.email)
+
             msg.html = "<h1>" + flask_login.current_user.username + " recorded a new result:</h1>"
             msg.html += "<br />"
             msg.html += "<hr />"
@@ -134,10 +138,7 @@ class ResultCRUD(flask.views.MethodView):
             msg.html += "<hr />"
             msg.html += "<a href=\"www.wodtag.com\">#WodTag</a>"
 
-            ## Known bug = Bcc doesn't work??
-            for follower in flask_login.current_user.followed_by:
-                if follower.email is not None or follower.email != "":
-                    msg.recipients = [follower.email]
+            mail.send(msg)
             # end email code
 
             return flask.redirect(flask.url_for('result', result_id=result.id))

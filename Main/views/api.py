@@ -38,13 +38,13 @@ class WeighInAPI(flask.views.MethodView):
             final_json += "\"" + weighin.date.strftime('%m/%d/%Y') + "\","
         final_json = final_json[:-1] + "],"
         final_json += "\"data\": ["
-        final_json += jsonify('Weight', 0, [str(w.weight) for w in weighins], "#4572A7") + ","
-        final_json += jsonify('Body Fat', 1, [str(w.body_fat) for w in weighins], "#89A54E") + ","
-        final_json += jsonify('Muscle Mass', 1, [str(w.muscle_mass) for w in weighins], "#89A54E", True) + "]}"
+        final_json += jsonify('Weight', 0, [w.date for w in weighins], [str(w.weight) for w in weighins], "#4572A7") + ","
+        final_json += jsonify('Body Fat', 1, [w.date for w in weighins], [str(w.body_fat) for w in weighins], "#89A54E") + ","
+        final_json += jsonify('Muscle Mass', 1, [w.date for w in weighins], [str(w.muscle_mass) for w in weighins], "#89A54E", True) + "]}"
         return final_json
 
 
-def jsonify(name, axis, data, color, dashed=False, ):
+def jsonify(name, axis, xData, yData, color, dashed=False, ):
     json = "{\"name\":\"" + name + "\""
     json += ", \"connectNulls\": true"
     json += ", \"color\":\"" + color + "\""
@@ -52,10 +52,10 @@ def jsonify(name, axis, data, color, dashed=False, ):
         json += ", \"dashStyle\": \"shortdot\""
     json += ", \"yAxis\":" + str(axis)
     json += ", \"data\": ["
-    for d in data:
-        if float(d) == 0:
-            json += "null,"
+    for x, y in zip(xData, yData):
+        if float(y) == 0:
+            json += "[null,null],"
         else:
-            json += d + ","
+            json += "[" + x.strftime('%m/%d/%Y') + "," + y + "],"
     json = json[:-1] + "]}"
     return json
