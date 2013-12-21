@@ -53,9 +53,10 @@ def jsonify(name, axis, xData, yData, color, dashed=False, ):
     json += ", \"yAxis\":" + str(axis)
     json += ", \"data\": ["
     for x, y in zip(xData, yData):
+        json += "[" + str(int(x.strftime('%s'))*1000) + ","
         if float(y) == 0:
-            json += "[null,null],"
+            json += "null],"
         else:
-            json += "[" + x.strftime('%m/%d/%Y') + "," + y + "],"
+            json += y + "],"
     json = json[:-1] + "]}"
     return json
