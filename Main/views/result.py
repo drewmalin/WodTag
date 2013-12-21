@@ -2,7 +2,7 @@ import re
 from ..util import db, mail
 from ..models import *
 from flask.ext.login import login_required
-from flask.ext.mail import Message
+from flask.ext.sendmail import Message
 import flask
 import flask_login
 import flask.views
@@ -109,14 +109,37 @@ class ResultCRUD(flask.views.MethodView):
             db.session.add(result)
             db.session.commit()
             flask.flash("Successfully recorded workout!", "success")
-            """
-            msg = Message("Hello",
-                  sender="from@example.com",
-                  recipients=["drewmalin@gmail.com"])
-            msg.body = "testing"
-            msg.html = "<b>testing</b>"
-            mail.send(msg)
-            """
+
+            # Here be email code... this should be moved to a utility class
+            msg = Message(flask_login.current_user.username + " just recorded a new workout result!",
+                  sender=("WodTag", "admin@wodtag.com"))
+
+            msg.html = "<h1>" + flask_login.current_user.username + " recorded a new result:</h1>"
+            msg.html += "<br />"
+            msg.html += "<hr />"
+            msg.html += "<h4>" + result.workout.name+ "</h4>"
+            msg.html += "<table cellspacing=\"10\">"
+            for result_part in result.parts:
+                msg.html += "<tr>"
+                msg.html += "<td><pre>" + result_part.part.description + "</pre></td>"
+                msg.html += "<td style=\"vertical-align: top\"><pre>" + \
+                            result_part.result + " (" + result_part.part.uom + ")</  pre></td>"
+                msg.html += "<td style=\"vertical-align: top\">"
+                if result_part.pr:
+                    msg.html += "<pre><b>PR!</b></pre>"
+                msg.html += "</td>"
+                msg.html += "</tr>"
+            msg.html += "</table>"
+            msg.html += "<br />"
+            msg.html += "<hr />"
+            msg.html += "<a href=\"www.wodtag.com\">#WodTag</a>"
+
+            ## Known bug = Bcc doesn't work??
+            for follower in flask_login.current_user.followed_by:
+                if follower.email is not None or follower.email != "":
+                    msg.recipients = [follower.email]
+            # end email code
+
             return flask.redirect(flask.url_for('result', result_id=result.id))
 
 
