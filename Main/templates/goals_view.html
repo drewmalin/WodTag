@@ -1,0 +1,133 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container">
+    {% if viewed_user %}
+        <div class="page-header">
+            <div class="row">
+                <div class="col-lg-2">
+                    {% set imgpath = 'img/' ~ viewed_user.id %}
+                    <a href="{{ url_for('user', user_id=viewed_user.id) }}">
+                        <img class="img-rounded"
+                             src="{{ url_for('static', filename=imgpath) }}"
+                             width="150px"
+                             alt="Image not found" onError="this.src='{{url_for('static', filename='img/placeholder.png')}}';">
+                    </a>
+                </div>
+                <div class="col-lg-10">
+                    <div class="col-lg-6">
+                        <h3 class="pull-left">
+                            {{ viewed_user.username }}
+                            <span class="btn-group">
+                                <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="{{ url_for('user_edit', user_id=viewed_user.id) }}">Edit Profile</a></li>
+                                    <li role="presentation" class="divider"></li>
+                                    {% if viewed_user.member_of_gym %}
+                                        <li><a href="{{ url_for('gym', gym_id=viewed_user.member_of_gym.id) }}">View Gym</a></li>
+                                    {% elif viewed_user.owns_gym %}
+                                        <li><a href="{{ url_for('gym', gym_id=viewed_user.owns_gym.id) }}">View Gym</a></li>
+                                    {% elif viewed_user.is_gym_owner %}
+                                        <li><a href="{{ url_for('gym_create') }}">Create Gym</a></li>
+                                    {% else %}
+                                         <li><a href="{{ url_for('gyms') }}">Find Gym</a></li>
+                                    {% endif %}
+                                </ul>
+                            </span>
+                        </h3>
+                    </div>
+                    <div class="col-lg-6">
+                        {% if viewed_user.is_gym_owner and viewed_user.owns_gym  %}
+                            <h3 class="pull-right">Owner of: <a href="{{ url_for('gym', gym_id=viewed_user.owns_gym.id) }}">{{ viewed_user.owns_gym.name }}</a></h3>
+                        {% elif viewed_user.member_of_gym %}
+                            <h3 class="pull-right">Member of: <a href="{{ url_for('gym', gym_id=viewed_user.member_of_gym.id) }}">{{ viewed_user.member_of_gym.name }}</a></h3>
+                        {% endif %}
+                        <br /><br /><br />
+                        {% if viewed_user.follows %}
+                            <h3 class="pull-right">Followed Users: <a href="{{ url_for('user_follows', user_id=viewed_user.id) }}">{{viewed_user.follows|length}}</a></h3>
+                        {% else %}
+                            <h3 class="pull-right">Followed Users: 0</h3>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div> <!-- End header -->
+        <!-- Nav tabs -->
+        <ul id="tabs" class="nav nav-tabs">
+            {% if viewed_user.owns_gym %}
+                <li><a href="{{ url_for('user', user_id=viewed_user.id) }}#gym_results">Gym Results</a></li>
+            {% endif %}
+            <li><a href="{{ url_for('user', user_id=viewed_user.id) }}#personal_results">Personal Results</a></li>
+            {% if viewed_user.id == user.id %}
+                <li><a href="{{ url_for('weighin_view') }}">Weigh-in</a></li>
+            {% endif %}
+            <li class="active"><a href="#">Goals</a></li>
+        </ul>
+        <br />
+        {% if viewed_user.id == user.id %}
+            <a class="btn btn-primary" href="{{ url_for('goal_create') }}">Create Goal</a>
+        {% endif %}
+        <br /><br />
+        {% if viewed_user.goals %}
+            <h4>Active Goals</h4>
+            {% for goal in viewed_user.goals if goal.active and not goal.complete%}
+                <div class="well well-sm">
+                    <h4>
+                        <a href="{{ url_for('goal', goal_id=goal.id) }}">
+                            {% if goal.complete %}
+                                <strike>{{ goal.title }}</strike>
+                            {% else %}
+                                {{ goal.title }}
+                            {% endif %}
+                        </a>
+                        {% if goal.user.id == user.id %}
+                            <span class="btn-group">
+                                <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                    <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    {% if goal.user.id == user.id %}
+                                        <li><a href="{{ url_for('goal_part', goal_id=goal.id) }}">Update Goal</a></li>
+                                        <li><a href="{{ url_for('goal_edit', goal_id=goal.id) }}">Edit Goal</a></li>
+                                    {% endif %}
+                                </ul>
+                            </span>
+                        {% endif %}
+                    </h4>
+                    {{ goal.parts | length }} Updates
+                </div>
+            {% endfor %}
+            <hr>
+            <h4>Other Goals</h4>
+            {% for goal in viewed_user.goals if goal.complete or not goal.active %}
+                <div class="well well-sm">
+                    <h4>
+                        <a href="{{ url_for('goal', goal_id=goal.id) }}">
+                            {% if goal.complete %}
+                                <strike>{{ goal.title }}</strike>
+                            {% else %}
+                                {{ goal.title }}
+                            {% endif %}
+                        </a>
+                        <span class="btn-group">
+                            <button class="btn btn-default btn-sm dropdown-toggle" type="button" data-toggle="dropdown">
+                                <span class="glyphicon glyphicon-cog"></span> <b class="caret"></b>
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% if goal.user.id == user.id %}
+                                    <li><a href="{{ url_for('goal_part', goal_id=goal.id) }}">Update Goal</a></li>
+                                    <li><a href="{{ url_for('goal_edit', goal_id=goal.id) }}">Edit Goal</a></li>
+                                {% endif %}
+                            </ul>
+                        </span>
+                    </h4>
+                    {{ goal.parts | length }} Updates
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% else %}
+        <h3>:(</h3>
+    {% endif %}
+</div>
+{% endblock %}

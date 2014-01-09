@@ -133,6 +133,7 @@
             {% endif %}
             <li><a href="{{ url_for('index') }}#personal_results">Personal Results</a></li>
             <li class="active"><a href="#">Weigh-in</a></li>
+            <li><a href="{{ url_for('goals_view') }}?user_id={{user.id}}">Goals</a></li>
         </ul>
         <br />
         <a class="btn btn-primary" href="{{ url_for('weighin_create') }}">Post Weigh-in</a>

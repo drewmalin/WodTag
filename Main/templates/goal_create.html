@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>Create Goal</h1>
+    </div>
+    <form class="form" action="{{ url_for('goals') }}" method="POST">
+        <div class="form-group">
+            <label for="title">Title <font color="red">*</font></label>
+            <input class="form-control" name="title" id="title" autofocus/><br>
+        </div>
+        <div class="checkbox">
+            <label>
+                Active <input name="active" id="active" type="checkbox"/><br>
+            </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}

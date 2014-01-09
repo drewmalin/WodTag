@@ -97,6 +97,7 @@
             {% if viewed_user.id == user.id %}
                 <li><a href="{{ url_for('weighin_view') }}">Weigh-in</a></li>
             {% endif %}
+            <li><a href="{{ url_for('goals_view') }}?user_id={{viewed_user.id}}">Goals</a></li>
         </ul>
         <!-- Tab panes -->
         <div class="tab-content">

@@ -13,6 +13,7 @@ from Main.views.result import *
 from Main.views.api import *
 from Main.views.search import *
 from Main.views.weighin import *
+from Main.views.goal import *
 
 ## ------------ INDEX -------------- ##
 app.add_url_rule('/',
@@ -107,6 +108,27 @@ app.add_url_rule('/result/create/<int:workout_id>',
                  methods=['GET'])
 app.add_url_rule('/result/edit/<int:result_id>',
                  view_func=ResultEdit.as_view('result_edit'),
+                 methods=['GET'])
+
+## -------------- GOALS -------------- ##
+app.add_url_rule('/goals/',
+                 view_func=Goals.as_view('goals'),
+                 methods=['GET', 'POST'])
+app.add_url_rule('/goal/',
+                 defaults={'goal_id': None},
+                 view_func=GoalCRUD.as_view('goals_view'),
+                 methods=['GET', 'POST'])
+app.add_url_rule('/goal/<int:goal_id>',
+                 view_func=GoalCRUD.as_view('goal'),
+                 methods=['GET', 'POST'])
+app.add_url_rule('/goal/create',
+                 view_func=GoalCreate.as_view('goal_create'),
+                 methods=['GET'])
+app.add_url_rule('/goal/edit/<int:goal_id>',
+                 view_func=GoalEdit.as_view('goal_edit'),
+                 methods=['GET'])
+app.add_url_rule('/goal/<int:goal_id>/update/',
+                 view_func=GoalPartEdit.as_view('goal_part'),
                  methods=['GET'])
 
 ## -------------- API ---------------- ##

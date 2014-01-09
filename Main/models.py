@@ -40,6 +40,7 @@ class User(db.Model):
     member_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
     owner_gym_id = db.Column(db.Integer, db.ForeignKey('Gym.id'))
     weighins = relationship('WeighIn', backref="user", order_by='WeighIn.date.desc()')
+    goals = relationship('Goal', backref='user')
 
     def __init__(self, username, password):
         self.username = username
@@ -173,3 +174,20 @@ class Tag(db.Model):
 
     def __init__(self, name):
         self.name = name
+
+
+class Goal(db.Model):
+    __tablename__ = 'Goal'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128))
+    complete = db.Column(db.Boolean)
+    active = db.Column(db.Boolean)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.id'))
+    parts = relationship('GoalPart', backref='goal', order_by='GoalPart.date.desc()')
+
+class GoalPart(db.Model):
+    __tablename__ = 'GoalPart'
+    id = db.Column(db.Integer, primary_key=True)
+    description = db.Column(db.String(256))
+    date = db.Column(db.DateTime)
+    part_id = db.Column(db.Integer, db.ForeignKey('Goal.id'))

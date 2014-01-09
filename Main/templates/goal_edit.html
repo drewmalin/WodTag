@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block body %}
+<div class="container">
+    <div class="page-header">
+        <h1>Edit Goal</h1>
+    </div>
+    <form class="form" action="{{ url_for('goal', goal_id=goal.id) }}" method="POST">
+        <input type="hidden" name="_method" value="PUT">
+        <div class="form-group">
+            <label for="title">Title <font color="red">*</font></label>
+            <input class="form-control" name="title" id="title" value="{{goal.title}}" autofocus/><br>
+        </div>
+        <div class="checkbox">
+            <label>
+                Active
+                {% if goal.active %}
+                    <input name="active" type="checkbox" checked/><br>
+                {% else %}
+                    <input name="active" type="checkbox"/><br>
+                {% endif %}
+            </label>
+        </div>
+        <div class="checkbox">
+            <label>
+                Complete
+                {% if goal.complete %}
+                    <input name="complete" type="checkbox" checked/><br>
+                {% else %}
+                    <input name="complete" type="checkbox"/><br>
+                {% endif %}
+            </label>
+        </div>
+        <button class="btn btn-lg btn-primary btn-block" name="submit" type="submit">Save</button>
+    </form>
+</div>
+{% endblock %}
